@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipe.Web.Server", "Recipe.Web\Server\Recipe.Web.Server.csproj", "{F04D70BF-9058-4C3F-B139-38A8AAD02D3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipe.Web.Server", "Recipe.Web\Server\Recipe.Web.Server.csproj", "{F04D70BF-9058-4C3F-B139-38A8AAD02D3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipe.Web.Client", "Recipe.Web\Client\Recipe.Web.Client.csproj", "{C73980B0-C4EA-4E2C-9AB9-85F567321093}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipe.Web.Client", "Recipe.Web\Client\Recipe.Web.Client.csproj", "{C73980B0-C4EA-4E2C-9AB9-85F567321093}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipe.Web.Data", "Recipe.Web\Shared\Recipe.Web.Data.csproj", "{919A26D7-F7FD-4D9D-A78F-7949A47AD237}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipe.Web.Data", "Recipe.Web\Shared\Recipe.Web.Data.csproj", "{919A26D7-F7FD-4D9D-A78F-7949A47AD237}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
