@@ -28,11 +28,11 @@ namespace Recipe.Web.Server.Controllers
             this.logger = logger;
 
             
-            var context = new RecipeContext();
+            /*var context = new RecipeContext();
             // Whatever the password that is sent from the Create Account form. I will need to hash the password before I send it to Azure.
             var thepassword = "himan";
             context.Users.Add(new User() { Email = "", Password = StringHasher.Hash(thepassword), IsLocked = false });
-            context.SaveChanges();
+            context.SaveChanges();*/
         }
 
         [HttpGet]

@@ -12,17 +12,15 @@ namespace Recipe.Web.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true),
                     UserType = table.Column<int>(nullable: false),
+                    UserName = table.Column<string>(maxLength: 50, nullable: false),
+                    Password = table.Column<string>(maxLength: 50, nullable: false),
                     FailedLoginAttempts = table.Column<int>(nullable: false),
                     IsLocked = table.Column<bool>(nullable: false),
-                    SecurityQuestion1 = table.Column<string>(nullable: true),
-                    SecurityQuestion2 = table.Column<string>(nullable: true),
-                    SecurityAnswer1 = table.Column<string>(nullable: true),
-                    SecurityAnswer2 = table.Column<string>(nullable: true)
+                    SecurityQuestion1 = table.Column<string>(maxLength: 100, nullable: false),
+                    SecurityQuestion2 = table.Column<string>(maxLength: 100, nullable: false),
+                    SecurityAnswer1 = table.Column<string>(maxLength: 100, nullable: false),
+                    SecurityAnswer2 = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
