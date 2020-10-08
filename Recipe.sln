@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipe.Web.Client", "Recipe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recipe.Web.Data", "Recipe.Web\Shared\Recipe.Web.Data.csproj", "{919A26D7-F7FD-4D9D-A78F-7949A47AD237}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiClientRecipe", "HttpClientRecipe\ApiClientRecipe.csproj", "{2716BB0D-41E9-4C61-8D81-CE73525341A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{919A26D7-F7FD-4D9D-A78F-7949A47AD237}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{919A26D7-F7FD-4D9D-A78F-7949A47AD237}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{919A26D7-F7FD-4D9D-A78F-7949A47AD237}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2716BB0D-41E9-4C61-8D81-CE73525341A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2716BB0D-41E9-4C61-8D81-CE73525341A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2716BB0D-41E9-4C61-8D81-CE73525341A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2716BB0D-41E9-4C61-8D81-CE73525341A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
