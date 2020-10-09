@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Recipe.Web.Data.Models
 {
-    public class Recipe
+    public class TheRecipe
     {
         public int id { get; set; }
         public string title { get; set; }
