@@ -1,0 +1,70 @@
+﻿@page "/recipepage"
+<!--This is just a very basic outline of what the recipe page
+    will look like for now. -AL-->
+<h3>*Recipe Name*</h3> <p>Date Added: TBD</p>
+<br />
+<body>
+    <!--Picture and Description section (default picture and description) -AL-->
+    <p class="foodinfo" text-align: center><img src="/images/taco.png" width="300" height="300" /> *Insert Eloquent Description Here*</p>
+    <br />
+    <!--This section displays the Ingredients and the Steps in tables -AL-->
+    <!--Setup will change in the future -AL-->
+    <div style="display: table" width="100%" margin: 0 auto>
+        <div style="display: table-row">
+            <div style="display: table-cell">
+                <ui class="ingredientList" float:left>
+                    <li>Ingredient 1</li>
+                    <li>Ingredient 2</li>
+                    <li>Ingredient 3</li>
+                </ui>
+            </div>
+            <div style="display: table-cell">
+                <ol class="steps" float:right>
+                    <li>Step 1: Do this</li>
+                    <li>Step 2: Do that</li>
+                    <li>Step 3: Do more stuff</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <br />
+
+</body>
+<br />
+<div text-align:center>
+    <h6>Reviews</h6>
+<textarea></textarea> <br />
+    <button @onclick="reviewClick">Post Review</button>
+    <br /> <br />
+    <button type="button" @onclick="printClick">Print</button>
+    <button type="button" @onclick="shareClick">Share</button>
+    <button type="button" @onclick="saveClick">Save</button>
+</div>
+<p>Button Test: @testButtons</p>
+@code {
+    private string testButtons;
+
+    //print button event -AL
+    private void printClick()
+    {
+        testButtons = "print button pressed";
+    }
+
+    //share button event -AL
+    private void shareClick()
+    {
+        testButtons = "share button pressed";
+    }
+
+    //save button event -AL
+    private void saveClick()
+    {
+        testButtons = "save button pressed";
+    }
+
+    //post review button event -AL
+    private void reviewClick()
+    {
+        testButtons = "review button pressed";
+    }
+}

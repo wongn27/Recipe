@@ -1,0 +1,22 @@
+﻿@page "/homepage"
+<h1>In The Fridge</h1>
+<br />
+<br />
+<input type="text"
+       @bind="search" />
+<button type="button" @onclick="enterClick">Enter</button>
+<br />
+<br />
+<p>
+    <!--check to make sure code is reading the input given-->
+    Input: @search
+</p>
+
+@code {
+    private string search = "";
+
+    private void enterClick()
+    {
+        //TBA: database search functionality
+    }
+}
