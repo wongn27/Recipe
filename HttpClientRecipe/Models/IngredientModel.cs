@@ -6,70 +6,39 @@ using System.Threading.Tasks;
 namespace ApiClientRecipe.Models
 {
 
-    public class IngredientModel
+    public class IngredientList
     {
-        public int id { get; set; }
-        public string original { get; set; }
-        public string originalName { get; set; }
+        public List<Ingredient> Ingredients { get; set; }
+    }
+
+    public class Ingredient
+    {
         public string name { get; set; }
-        public float amount { get; set; }
-        public string unit { get; set; }
-        public string unitShort { get; set; }
-        public string unitLong { get; set; }
-        public string[] possibleUnits { get; set; }
-        public Estimatedcost estimatedCost { get; set; }
-        public string consistency { get; set; }
-        public string[] shoppingListUnits { get; set; }
-        public string aisle { get; set; }
         public string image { get; set; }
-        public object[] meta { get; set; }
-        public Nutrition nutrition { get; set; }
-        public string[] categoryPath { get; set; }
+        public int id { get; set; }
+        public string aisle { get; set; }
+        public string[] possibleUnits { get; set; }
+
+
+
+        public List<Ingredient> GetAllIngredients(List<Ingredient> iL)
+        {
+            List<Ingredient> ingredients = new List<Ingredient>();
+            IngredientList ingredientList = new IngredientList();
+            Ingredient newIngredient = new Ingredient();
+
+            for ( int i = 0; i < iL.Count; i++)
+            {
+                newIngredient.name = iL[i].name;
+                newIngredient.image = iL[i].image;
+                newIngredient.id = iL[i].id;
+                ingredients.Add(newIngredient);                
+            }
+            ingredientList.Ingredients = ingredients;
+            return ingredientList.Ingredients;
+        }
     }
 
-    public class Estimatedcost
-    {
-        public float value { get; set; }
-        public string unit { get; set; }
-    }
-
-    public class Nutrition
-    {
-        public Nutrient[] nutrients { get; set; }
-        public Property1[] properties { get; set; }
-        public Caloricbreakdown caloricBreakdown { get; set; }
-        public Weightperserving weightPerServing { get; set; }
-    }
-
-    public class Caloricbreakdown
-    {
-        public float percentProtein { get; set; }
-        public float percentFat { get; set; }
-        public float percentCarbs { get; set; }
-    }
-
-    public class Weightperserving
-    {
-        public int amount { get; set; }
-        public string unit { get; set; }
-    }
-
-    public class Nutrient
-    {
-        public string title { get; set; }
-        public float amount { get; set; }
-        public string unit { get; set; }
-        public float percentOfDailyNeeds { get; set; }
-    }
-
-    public class Property1
-    {
-        public string title { get; set; }
-        public float amount { get; set; }
-        public string unit { get; set; }
-    }
-
-
-
+  
 
 }
