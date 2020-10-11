@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Text;
+using Recipe.Web.Data.Models;
 
 namespace Recipe.Web.Data
 {
@@ -13,8 +12,8 @@ namespace Recipe.Web.Data
             optionsBuilder.UseSqlServer("Server=tcp:recipe-fsc.database.windows.net,1433;Initial Catalog=recipe;Persist Security Info=False;User ID=wongnatmei@gmail.com@recipe-fsc;Password=Twocashews$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             base.OnConfiguring(optionsBuilder);
         }
-
-        public DbSet<User> Users { get; set; }
         
+        public DbSet<User> Users { get; set; }
+        public DbSet<InTheFridgeRecipe> Recipes { get; set; }
     }
 }
