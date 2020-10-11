@@ -1,127 +1,10 @@
-﻿using System;
-using System.Globalization;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Recipe.Web.Data.Models
 {
-    public class Recipe
-    {
-
-        public bool IsVegetarian { get; set; }
-
-        public bool IsVegan { get; set; }
-
-        [JsonPropertyName("glutenFree")]
-        public bool IsGlutenFree { get; set; }
-
-        [JsonPropertyName("dairyFree")]
-        public bool IsDairyFree { get; set; }
-
-        [JsonPropertyName("veryHealthy")]
-        public bool VeryHealthy { get; set; }
-
-        [JsonPropertyName("cheap")]
-        public bool Cheap { get; set; }
-
-        [JsonPropertyName("veryPopular")]
-        public bool VeryPopular { get; set; }
-
-        [JsonPropertyName("sustainable")]
-        public bool Sustainable { get; set; }
-
-        [JsonPropertyName("weightWatcherSmartPoints")]
-        public long WeightWatcherSmartPoints { get; set; }
-
-        [JsonPropertyName("gaps")]
-        public string Gaps { get; set; }
-
-        [JsonPropertyName("lowFodmap")]
-        public bool LowFodmap { get; set; }
-
-        [JsonPropertyName("preparationMinutes")]
-        public long? PreparationMinutes { get; set; }
-
-        [JsonPropertyName("cookingMinutes")]
-        public long? CookingMinutes { get; set; }
-
-        [JsonPropertyName("aggregateLikes")]
-        public long AggregateLikes { get; set; }
-
-        [JsonPropertyName("spoonacularScore")]
-        public long SpoonacularScore { get; set; }
-
-        [JsonPropertyName("healthScore")]
-        public long HealthScore { get; set; }
-
-        [JsonPropertyName("creditsText")]
-        public string CreditsText { get; set; }
-
-        [JsonPropertyName("license")]
-        public string License { get; set; }
-
-        [JsonPropertyName("sourceName")]
-        public string SourceName { get; set; }
-
-        [JsonPropertyName("pricePerServing")]
-        public double PricePerServing { get; set; }
-
-        [JsonPropertyName("extendedIngredients")]
-        public string Spoon_ExtendedIngredients { get; set; }
-
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
-
-        [JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [JsonPropertyName("readyInMinutes")]
-        public long ReadyInMinutes { get; set; }
-
-        [JsonPropertyName("servings")]
-        public long Servings { get; set; }
-
-        [JsonPropertyName("sourceUrl")]
-        public string SourceUrl { get; set; }
-
-        [JsonPropertyName("image")]
-        public string Image { get; set; }
-
-        [JsonPropertyName("imageType")]
-        public string ImageType { get; set; }
-
-        [JsonPropertyName("summary")]
-        public string Summary { get; set; }
-
-        [JsonPropertyName("cuisines")]
-        public string[] Cuisines { get; set; }
-
-        [JsonPropertyName("dishTypes")]
-        public string[] DishTypes { get; set; }
-
-        [JsonPropertyName("diets")]
-        public object[] Diets { get; set; }
-
-        [JsonPropertyName("occasions")]
-        public object[] Occasions { get; set; }
-
-        [JsonPropertyName("winePairing")]
-        public WinePairing WinePairing { get; set; }
-
-        [JsonPropertyName("instructions")]
-        public string Instructions { get; set; }
-
-        [JsonPropertyName("analyzedInstructions")]
-        public AnalyzedInstruction[] AnalyzedInstructions { get; set; }
-
-        [JsonPropertyName("spoonacularSourceUrl")]
-        public string SpoonacularSourceUrl { get; set; }
-    }
-
-    public enum Consistency { Liquid, Solid };
     public class SpoonacularRecipe
     {
         [JsonPropertyName("vegetarian")]
-        [JsonIgnore]
         public bool Vegetarian { get; set; }
 
         [JsonPropertyName("vegan")]
@@ -164,10 +47,10 @@ namespace Recipe.Web.Data.Models
         public long AggregateLikes { get; set; }
 
         [JsonPropertyName("spoonacularScore")]
-        public long SpoonacularScore { get; set; }
+        public double SpoonacularScore { get; set; }
 
         [JsonPropertyName("healthScore")]
-        public long HealthScore { get; set; }
+        public double HealthScore { get; set; }
 
         [JsonPropertyName("creditsText")]
         public string CreditsText { get; set; }
@@ -214,9 +97,11 @@ namespace Recipe.Web.Data.Models
         [JsonPropertyName("dishTypes")]
         public string[] DishTypes { get; set; }
 
+        // TODO Diets
         [JsonPropertyName("diets")]
         public object[] Diets { get; set; }
 
+        // TODO Occasions
         [JsonPropertyName("occasions")]
         public object[] Occasions { get; set; }
 
@@ -248,7 +133,7 @@ namespace Recipe.Web.Data.Models
         public long Number { get; set; }
 
         [JsonPropertyName("step")]
-        public string StepStep { get; set; }
+        public string OriginalStep { get; set; }
 
         [JsonPropertyName("ingredients")]
         public StepsIngredients[] Ingredients { get; set; }
@@ -311,7 +196,7 @@ namespace Recipe.Web.Data.Models
         public string Image { get; set; }
 
         [JsonPropertyName("consistency")]
-        public Consistency Consistency { get; set; }
+        public string Consistency { get; set; }
 
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -403,6 +288,4 @@ namespace Recipe.Web.Data.Models
         [JsonPropertyName("link")]
         public string Link { get; set; }
     }
-
-
 }
