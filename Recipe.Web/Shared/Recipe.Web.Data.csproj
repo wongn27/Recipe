@@ -5,12 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20201007180908_Create_Users_Table.cs" />
-    <Compile Remove="Migrations\20201007180908_Create_Users_Table.Designer.cs" />
-    <Compile Remove="Migrations\20201007181437_Create_Users_Table.cs" />
-    <Compile Remove="Migrations\20201007181437_Create_Users_Table.Designer.cs" />
-    <Compile Remove="Migrations\20201007182153_Create_Users_Table.cs" />
-    <Compile Remove="Migrations\20201007182153_Create_Users_Table.Designer.cs" />
+    <Compile Remove="Migrations\20201011032039_Add_Recipe_Table.cs" />
+    <Compile Remove="Migrations\20201011032039_Add_Recipe_Table.Designer.cs" />
+    <Compile Remove="Migrations\20201011032450_Create_InTheFridgeRecipe_Table.cs" />
+    <Compile Remove="Migrations\20201011032450_Create_InTheFridgeRecipe_Table.Designer.cs" />
+    <Compile Remove="Migrations\20201011054457_Hello.cs" />
+    <Compile Remove="Migrations\20201011054457_Hello.Designer.cs" />
+    <Compile Remove="Migrations\20201011054537_Hello.cs" />
+    <Compile Remove="Migrations\20201011054537_Hello.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
