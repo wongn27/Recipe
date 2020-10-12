@@ -32,6 +32,5 @@ namespace Recipe.Web.Data.Models
         [Required]
         [MaxLength(100)]
         public string SecurityAnswer2 { get; set; }
-
     }
 }

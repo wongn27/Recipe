@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient.Server;
 using Recipe.Web.Data;
@@ -22,12 +23,24 @@ namespace Recipe.Web.Server.Services
 
         public bool IsEmailValid(string email)
         {
-            return accountService.HasAccount(email);
+            Regex regex = new Regex(@"^\S +@\S +\.\S +$");
+           
+            if (!regex.IsMatch(email)) {
+                throw new ArgumentException("The email provided is not valid.");
+            }
+            return true;
         }
 
         public bool IsPasswordValid(string email, string nonHashedPassword)
         {
-            if (!IsEmailValid(email))
+            Regex regex = new Regex(@"(?=^.{8,}$)(?=.*\w)(?=.*[0-9])");
+
+            if (!regex.IsMatch(nonHashedPassword))
+            {
+                throw new ArgumentException("The password provided is not valid. Must be a minimum length of 8 and at least one number");
+            }
+
+            if (!accountService.HasAccount(email))
             {
                 throw new ArgumentException("The email does not exist in the system to authenticate against.");
             }
@@ -38,7 +51,7 @@ namespace Recipe.Web.Server.Services
             return user.Password.Equals(hashedPassword);         
         }
 
-        public bool Authenticate(string email, string password)
+        public void Authenticate(string email, string password)
         {
             if (!IsEmailValid(email))
             {
@@ -49,8 +62,6 @@ namespace Recipe.Web.Server.Services
             {
                 throw new ArgumentException("The password entered does not match in the account.");
             }
-
-            return true;
         }
     }
 }
