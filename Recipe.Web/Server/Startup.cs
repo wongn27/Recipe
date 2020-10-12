@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using Recipe.Web.Data;
 using Recipe.Web.Server.Services;
+using Recipe.Web.Data.Models;
 
 namespace Recipe.Web.Server
 {
@@ -27,6 +28,7 @@ namespace Recipe.Web.Server
             services.AddScoped<RecipeContext>();
             services.AddScoped<AccountService>();
             services.AddScoped<LoginService>();
+            services.AddScoped<AuthenticateModel>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
