@@ -1,16 +1,21 @@
 ﻿@page "/login"
+@inherits Recipe.Web.Data.Models.AuthenticateModel
+@using Recipe.Web.Data.Models
 <h3>Login</h3>
 <br />
 <br />
-<div display: inline-block>
-    <label>Email: </label>
-    <input id="email" @bind="check1" />
-</div>
-<div display: inline-block>
 
-    <label>Password: </label>
-    <input id="password" @bind="check2" />
-</div>
+<EditForm Model="@AuthModel">
+
+    <InputText id="email"
+               @bind-Value="@AuthModel.Email"
+               placeholder="Email">
+    </InputText>
+    <InputText id="password"
+               @bind-Value="@AuthModel.Password"
+               placeholder="Password">
+    </InputText>
+</EditForm>
 <br />
 <button type="button" @onclick="loginClick">Log In</button>
 <p>@login</p>
@@ -22,6 +27,7 @@
     private string check2;
     private string login = "";
 
+    private AuthenticateModel AuthModel { get; set; } = new AuthenticateModel();
     //login button event -AL
     private void loginClick()
     {
