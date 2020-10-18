@@ -1,0 +1,21 @@
+﻿@page "/forgot"
+<h3>Recover Account</h3>
+<br />
+<br />
+<div display: inline-block>
+    <label>Email: </label>
+    <input @bind="emailSearch"/>
+</div>
+<button type="button" @onclick="accountClick">Send Account Information</button>
+<br />
+<p>@testE</p>
+
+@code {
+    private string emailSearch = "";
+    private string testE = "";
+
+    private void accountClick()
+    {
+        testE = "Button Clicked";
+    }
+}

@@ -1,0 +1,34 @@
+﻿@page "/register"
+<h3>Registration</h3>
+<br />
+<br />
+<div display: inline-block>
+    <label>Email: </label>
+    <input id="email" @bind="check1" />
+</div>
+<div display: inline-block>
+
+    <label>Password: </label>
+    <input id="password" @bind="check2" />
+</div>
+<br />
+<button type="button" @onclick="registerClick">Create Account</button>
+<p>@register</p>
+@code {
+    //test strings, final version will compare to database -AL
+    private string email = "abc@123.com";
+    private string password = "1234567890";
+    private string check1;
+    private string check2;
+    private string check3;
+    private string register = "";
+
+    //login button event -AL
+    private void registerClick()
+    {
+        if (string.Equals(email, check1) && string.Equals(password, check2))
+        { register = "Registration successful"; }
+        else
+        { register = "Registration Failed"; }
+    }
+}

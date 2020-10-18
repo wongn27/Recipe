@@ -1,33 +1,46 @@
 ﻿@page "/login"
-<h3>Login</h3>
-<br />
-<br />
-<div display: inline-block>
-    <label>Email: </label>
-    <input id="email" @bind="check1" />
-</div>
-<div display: inline-block>
+    <!--This lets the page navigate to a different page on the button click -AL-->
+    @inject NavigationManager NavigationManager
+    <h3>Login</h3>
+    <br />
+    <br />
+    <div display: inline-block>
+        <label>Email: </label>
+        <input id="email" @bind="check1" />
+    </div>
+    <div display: inline-block>
 
-    <label>Password: </label>
-    <input id="password" @bind="check2" />
-</div>
-<br />
-<button type="button" @onclick="loginClick">Log In</button>
-<p>@login</p>
-@code {
-    //test strings, final version will compare to database -AL
-    private string email = "abc@123.com";
-    private string password = "1234567890";
-    private string check1;
-    private string check2;
-    private string login = "";
+        <label>Password: </label>
+        <input id="password" @bind="check2" />
+    </div>
+    <br />
+    <div>
+        <button type="button" @onclick="loginClick">Log In</button>
+        <button type="button" @onclick="forgotClick">Forgot Username/Password</button>
+    </div>
 
-    //login button event -AL
-    private void loginClick()
-    {
-        if (string.Equals(email, check1) && string.Equals(password, check2))
-        { login = "Login successful"; }
-        else
-        { login = "Login Failed"; }
+    <p>@login</p>
+    @code {
+        //test strings, final version will compare to database -AL
+        private string email = "abc@123.com";
+        private string password = "1234567890";
+        private string check1;
+        private string check2;
+        private string login = "";
+
+        //login button event -AL
+        private void loginClick()
+        {
+            if (string.Equals(email, check1) && string.Equals(password, check2))
+            { login = "Login successful"; }
+            else
+            { login = "Login Failed"; }
+        }
+
+        //forgot account information button event -AL
+        private void forgotClick()
+        {
+            NavigationManager.NavigateTo("/forgot");
+
+        }
     }
-}

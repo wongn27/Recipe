@@ -1,0 +1,42 @@
+﻿@page "/profile"
+<!--Outline of the user profile page -AL-->
+<h3>My Profile</h3>
+<img width="300" height="300" />
+
+
+<br />
+<label>About Me</label> <br />
+<p id="Description">@desc</p>
+<br />
+
+<label>Email</label> <br />
+<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
+<label>Password</label> <button @onclick="changePassClick">Change Password</button><br />
+
+<label>My Recipes</label>
+<ul>
+    <li>Recipe 1</li>
+</ul>
+
+<button type="button" @onclick="editProfileClick">Edit Profile</button>
+<p>@buttonCheck</p>
+@code {
+    private string buttonCheck = "";
+    private string desc = "*My Description*"; //testing that description is edited when button is pressed
+    private string imgSrc = "";
+    
+    private void editProfileClick()
+    {
+        buttonCheck = "edit profile button pressed";
+    }
+
+    private void changeUserClick()
+    {
+        buttonCheck = "change username button pressed";
+    }
+
+    private void changePassClick()
+    {
+        buttonCheck = "change password button pressed";
+    }
+}
