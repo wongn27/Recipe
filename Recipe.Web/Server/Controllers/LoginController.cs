@@ -36,8 +36,31 @@ namespace Recipe.Web.Server.Controllers
             }
             catch (Exception e)
             {
-                // Send this error messagr to the user. 
+                // Send this error message to the user. 
                 // e.Message
+            }
+        }
+
+        public async Task<ActionResult<bool>> ValidateUser(string email, string password)
+        {
+            if (accountService.HasAccount(email))
+            {
+                try
+                {
+                    var result = loginService.Authenticate(email, password);
+                    return Ok("fine");
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Error authenticating");
+                    return false;
+                }
+
+
+            }
+            else
+            {
+                return Unauthorized();
             }
         }
     }

@@ -51,7 +51,7 @@ namespace Recipe.Web.Server.Services
             return user.Password.Equals(hashedPassword);         
         }
 
-        public void Authenticate(string email, string password)
+        public bool Authenticate(string email, string password)
         {
             if (!IsEmailValid(email))
             {
@@ -62,6 +62,8 @@ namespace Recipe.Web.Server.Services
             {
                 throw new ArgumentException("The password entered does not match in the account.");
             }
+
+            return true;
         }
     }
 }
