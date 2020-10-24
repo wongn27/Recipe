@@ -17,8 +17,5 @@ namespace Recipe.Web.Data.Models
         public string Description { get; set; }
         public string Ingredients { get; set; }
         public string Steps { get; set; }
-
-        public RecipeApiSource ApiSourceName { get; set; }
-        public string ApiJson { get; set; }
     }
 }

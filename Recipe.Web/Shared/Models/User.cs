@@ -10,10 +10,12 @@ namespace Recipe.Web.Data.Models
         public Guid Id { get; set; }
         [Required]
         public UserType UserType { get; set; }
-        [Required]
+        [DataType(DataType.EmailAddress)]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
+        [Required(ErrorMessage = "Email is required")]
         [MaxLength(50)]
         public string Email { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [MaxLength(50)]
         public string Password { get; set; }
         [Required]
@@ -32,5 +34,14 @@ namespace Recipe.Web.Data.Models
         [Required]
         [MaxLength(100)]
         public string SecurityAnswer2 { get; set; }
+        public byte[] ProfilePicture { get; set; }
+        [Required (ErrorMessage = "First name is required")]
+        [MaxLength(30)]
+        public string FirstName { get; set; }
+        [Required(ErrorMessage = "Last name is required")]
+        [MaxLength(30)]
+        public string LastName { get; set; }
+        [MaxLength(100)]
+        public string Bio { get; set; }
     }
 }
