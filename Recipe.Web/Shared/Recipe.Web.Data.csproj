@@ -13,6 +13,8 @@
     <Compile Remove="Migrations\20201011054457_Hello.Designer.cs" />
     <Compile Remove="Migrations\20201011054537_Hello.cs" />
     <Compile Remove="Migrations\20201011054537_Hello.Designer.cs" />
+    <Compile Remove="Migrations\20201024041638_Add_More_Recipe_Columns.cs" />
+    <Compile Remove="Migrations\20201024041638_Add_More_Recipe_Columns.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
