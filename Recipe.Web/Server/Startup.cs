@@ -8,6 +8,10 @@ using Microsoft.Extensions.Hosting;
 using Recipe.Web.Data;
 using Recipe.Web.Data.Models;
 using Recipe.Web.Server.Services;
+using System.Linq;
+using System.Net.Http;
+using Syncfusion.Blazor;
+
 
 namespace Recipe.Web.Server
 {
@@ -27,7 +31,15 @@ namespace Recipe.Web.Server
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddControllersWithViews();
+            services.AddHttpClient();
+            services.AddControllersWithViews();
+            services.AddRazorPages();
 
+            //Allows to use Syncfusion - RT
+            services.AddSyncfusionBlazor();
+            //Allows the same instance of a class to be shared across components - RT
+            services.AddSingleton<Data.Models.IngredientModel>();
+          
             services
                 .AddScoped<RecipeContext>()
                 .AddScoped<AccountService>()
@@ -35,6 +47,7 @@ namespace Recipe.Web.Server
                 .AddScoped<AuthenticateModel>()
                 .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>()
                 .AddScoped<ISessionStorageService, SessionStorageService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

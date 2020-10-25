@@ -1,0 +1,227 @@
+﻿@page "/Search"
+@using Recipe.Web.Data.Models
+@inject HttpClient Http
+
+
+
+<h3>Ingredient Search</h3>
+
+<div display: inline-block>
+    <label>Ingredient: </label>
+    <input type="text" @bind="searchedIngredient" />
+</div>
+<button type="button" @onclick="searchClick">Search</button>
+
+@if (ingredients == null)
+{
+    <SfCalendar TValue="DateTime"></SfCalendar>
+
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th>Name</th>
+                <th>Aisle</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in ingredients)
+            {
+                <tr>
+                    <td colspan="2">
+                        <img src="@i.image" />
+                    </td>
+                    <td>@i.name</td>
+                    <td>@i.aisle</td>
+                    <td>@i.id</td>
+                    <td><button type="button" @onclick="@(() => AddSelectedIngToFridge(i))">Add To Fridge</button></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <!--ListBox for added Ingredients - RT-->
+    <div class="control-wrapper">
+        <SfListBox TValue="string[]" DataSource="@saved" TItem="IngredientModel" @ref="ListBoxObj">
+            <ListBoxFieldSettings Text="name" Value="id"></ListBoxFieldSettings>
+        </SfListBox>
+        <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
+    </div>
+
+    if (recipeSearchButtonPressed == true)
+    {
+        <div class="card-deck">
+            @foreach (var recipe in foundRecipes)
+            {
+            <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                <div class="card-header">
+                    <h3>@recipe.title</h3>
+                </div>
+                <img class="card-img-top" src="@recipe.image" />
+                <p style="color:red">Missing Ingredients: @recipe.missedIngredients.Length</p>
+                
+                @for(int i = 0; i < recipe.missedIngredientCount; i++)
+                {
+                     <p style="color:red"> @recipe.missedIngredients[i].name</p>
+                }
+
+            <div class="card-footer text-center">
+                <a href="#" class="btn btn-primary m-1">View Recipe</a>
+                <button class="btn btn-primary m-1" @onclick="@(() => DisplayDescriptionButton(recipe.id))">Quick Description</button>
+                @if (displaySummarizationButtonPressed == true)
+                {
+                    <p> @summarizeRecipe.summary.ToString()</p>
+                }
+                <a href="#" class="btn btn-primary m-1">View Missing Ingredients</a>
+            </div>
+            </div>
+            }
+        </div>
+    }
+    else
+    {
+
+    }
+}
+
+@code {
+
+    SfListBox<string[], IngredientModel> ListBoxObj;
+
+    //Getting textbox ingredient from user - RT
+    public string searchedIngredient { get; set; }
+    //Storing API link for easy access - RT
+    private string ApiIngredientSearchLink = "https://api.spoonacular.com/food/ingredients/autocomplete?query=";
+    //Setting number of results returned (Allowed 150/day for project) - RT
+    private int numOfResults = 1;
+    //Path for ingredient image - NOTE: Needs object image file name at end. Can be found after search API but before rendering page - RT
+    private string imageSourceIngredient = "https://spoonacular.com/cdn/ingredients_100x100/";
+    //Recipe Summarize URL Starting string - RT
+    public string apiRecipeSummarize = "https://api.spoonacular.com/recipes/";
+
+
+    //Creating list of ingredient class below. Code can be found in IngredientModel.cs - RT
+    IngredientModel[] ingredients;
+
+    //ObservableCollection of IngredientModel, code can be found in IngredientModel.cs - RT
+    IngredientList saved = new IngredientList();
+
+    //Instace of Recipe Summarization - RT
+    RecipeSummarize summarizeRecipe;
+
+    //Dispaly Summarization Button press - RT
+    bool displaySummarizationButtonPressed = false;
+
+
+    //Adds the new SELECTED ingredient from "Add To Fridge" Button to ObservableCollection of Ingredient - RT
+    public void AddSelectedIngToFridge(IngredientModel ingredient)
+    {
+        //Adding ingredient to collection -RT
+        saved.Add(new IngredientModel
+        {
+            id = ingredient.id,
+            image = ingredient.image,
+            name = ingredient.name,
+            aisle = ingredient.aisle,
+            possibleUnits = ingredient.possibleUnits
+        });
+    }
+
+    //Button Click handler. Making sure textbox isn't empty first so won't break API - RT
+    private async Task searchClick()
+    {
+
+        if (searchedIngredient != null)
+        {
+
+            ingredients = await Http.GetFromJsonAsync<IngredientModel[]>
+    (ApiIngredientSearchLink + searchedIngredient.ToString() + "&number=" + numOfResults + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+
+        }
+        foreach (var item in ingredients)
+        {
+            item.image = imageSourceIngredient + item.image;
+        }
+    }
+
+    //--------------------------------All Code below is for searching for Recipe, not ingredients - RT-----------------------------------
+
+    //This bool statment does not populate the Recipe part of the page if the ingredients are null - RT
+    bool recipeSearchButtonPressed = false;
+    //Number of Recipes returned - RT
+    int numOfRecipeResults = 1;
+    //Starting URL for the Recipe Search - RT
+    string apiRecipeSearchStart = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
+    //Number of recipes returned
+    int numOfRecipesReturned = 1;
+    //The starting URL for the images - RT
+    string imageSourceRecipe = "https://spoonacular.com/recipeImages/";
+
+    //Object to store recipes brought in by API - RT
+    RecipeModel[] foundRecipes;
+
+    //Will search the API once ingredients are aded and "FindRecipeButton" is pressed - RT
+    private async Task FindRecipesButton()
+    {
+        //Pulling all recipe data in as string first - RT
+        string ingredientAllc = "";
+        //Counter so we know when not to add a plus sign for search string - RT
+        int ingredientNum = 1;
+
+        //Loop to create the correct recipe search string for the API - RT
+        foreach (var ingredient in saved)
+        {
+            ingredientAllc += ingredient.name;
+
+            if (ingredientNum != saved.Count)
+            {
+                ingredientAllc += ",+";
+            }
+            ingredientNum++;
+        }
+
+        //Calling the API here, and storing the Recipes in a list - RT
+        foundRecipes = await Http.GetFromJsonAsync<RecipeModel[]>
+        (apiRecipeSearchStart + ingredientAllc + numOfRecipeResults + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+
+        //Correcting image source URL. ALSO, getting count of missing ingredients for upcoming array - RT
+        int missingIngCount = 0;
+        foreach (var recipe in foundRecipes)
+        {
+            //Correcting Img source - RT
+            recipe.image = imageSourceRecipe + recipe.id.ToString() + "-" + "240x150." + recipe.imageType.ToString();
+
+            //Getting missing ingredient count - RT
+            missingIngCount += recipe.missedIngredientCount;
+        }
+
+        //Setting trigger to true so HTML code above and run - RT
+        recipeSearchButtonPressed = true;
+
+    }
+
+    public async Task DisplayDescriptionButton(int recipeID)
+    {
+        summarizeRecipe = await Http.GetFromJsonAsync<RecipeSummarize>
+            (apiRecipeSummarize + recipeID + "/summary?&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+
+        displaySummarizationButtonPressed = true;
+    }
+
+}
+
+<!--Style Container for the "Fridge List" - RT-->
+<style>
+    .control-wrapper {
+        width: 250px;
+        margin-left: 35%;
+        margin-right: 35%;
+        margin-top: 12%;
+        margin-bottom: 15%;
+    }
+</style>
