@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Components.Authorization;
+using Recipe.Web.Data;
+using Blazored.SessionStorage;
 
 namespace Recipe.Web.Client
 {
@@ -18,6 +21,11 @@ namespace Recipe.Web.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddScoped<Blazored.SessionStorage.ISessionStorageService, Blazored.SessionStorage.SessionStorageService>();
+            builder.Services.AddOptions();
+            builder.Services.AddAuthorizationCore();
 
             await builder.Build().RunAsync();
         }

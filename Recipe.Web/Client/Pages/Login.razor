@@ -1,46 +1,89 @@
 ﻿@page "/login"
-    <!--This lets the page navigate to a different page on the button click -AL-->
-    @inject NavigationManager NavigationManager
-    <h3>Login</h3>
-    <br />
-    <br />
-    <div display: inline-block>
-        <label>Email: </label>
-        <input id="email" @bind="check1" />
+@using Recipe.Web.Data
+@using Recipe.Web.Data.Models
+@using  Microsoft.AspNetCore.Components.Authorization
+@using System.Text.Json
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject HttpClient httpClient
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<!--This lets the page navigate to a different page on the button click -AL-->
+@inject NavigationManager navigationManager
+
+<h3>Login</h3>
+<br />
+<br />
+<EditForm Model="@user" OnValidSubmit="@ValidateUser">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Email:</label>
+        <InputText class="form-control col-3" @bind-Value="user.Email" placeholder="Email" />
+        &nbsp;<ValidationMessage For="@(() => user.Email)" />
     </div>
-    <div display: inline-block>
-
-        <label>Password: </label>
-        <input id="password" @bind="check2" />
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Password:</label>
+        <InputText class="form-control col-3" @bind-Value="user.Password" placeholder="Password" />
+        &nbsp;<ValidationMessage For="@(() => user.Password)" />
     </div>
     <br />
-    <div>
-        <button type="button" @onclick="loginClick">Log In</button>
-        <button type="button" @onclick="forgotClick">Forgot Username/Password</button>
+    <div class="col-12 row">
+        <span class="col-2"></span>
+        <input type="submit" class="form-control col-1 btn btn-primary" @onclick="ValidateUser" value="Login" />
+        <input type="submit" class="form-control col-1 btn btn-primary" @onclick="forgotClick" value="Forgot Username/Password" />
+               @*<button type="button" @onclick="ValidateUser">Log In</button>*@
+        @*<button type="button" @onclick="forgotClick">Forgot Username/Password</button>*@
     </div>
 
-    <p>@login</p>
-    @code {
-        //test strings, final version will compare to database -AL
-        private string email = "abc@123.com";
-        private string password = "1234567890";
-        private string check1;
-        private string check2;
-        private string login = "";
+</EditForm>
 
-        //login button event -AL
-        private void loginClick()
-        {
-            if (string.Equals(email, check1) && string.Equals(password, check2))
-            { login = "Login successful"; }
-            else
-            { login = "Login Failed"; }
-        }
+<p>@login</p>
+@code {
+    private User user;
 
-        //forgot account information button event -AL
-        private void forgotClick()
-        {
-            NavigationManager.NavigateTo("/forgot");
+    protected override async Task OnInitializedAsync()
+    {
+        user = new User();
 
-        }
+        //var json = JsonSerializer.Serialize<User>(user);
+        await sessionStorage.SetItemAsync("email", user.Email);
+        var email = await sessionStorage.GetItemAsync<string>("email");
     }
+
+    private async Task<bool> ValidateUser()
+    {
+        // Assume that user is valid
+        // Check with database
+        // Call some action that validates the user
+
+        ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
+        navigationManager.NavigateTo("/");
+
+        return await Task.FromResult(true);
+    }
+
+
+
+
+    //test strings, final version will compare to database -AL
+    private string email = "abc@123.com";
+    private string password = "1234567890";
+    private string check1;
+    private string check2;
+    private string login = "";
+
+    //login button event -AL
+    private void loginClick()
+    {
+        //if (string.Equals(email, check1) && string.Equals(password, check2))
+        //{ login = "Login successful"; }
+        //else
+        //{ login = "Login Failed"; }
+    }
+
+    //forgot account information button event -AL
+    private void forgotClick()
+    {
+        navigationManager.NavigateTo("/forgot");
+
+    }
+}

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201024035608_Remove_API_Columns")]
+    partial class Remove_API_Columns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,15 +27,9 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CalorieCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("CookingTime")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
-
-                    b.Property<string>("Cuisines")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -41,42 +37,12 @@ namespace Recipe.Web.Data.Migrations
                     b.Property<string>("Ingredients")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Instructions")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCheap")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDairyFree")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsGlutenFree")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsHealthy")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPopular")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSustainable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsVegan")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsVegetarian")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("PictureUrl")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Servings")
-                        .HasColumnType("int");
 
                     b.Property<string>("Steps")
                         .HasColumnType("nvarchar(max)");
