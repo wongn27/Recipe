@@ -56,8 +56,11 @@
 
         using var response = await httpClient.PostAsJsonAsync<AuthenticateModel>("/login", user);
 
-        //((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
-        //navigationManager.NavigateTo("/");
+        if (response.IsSuccessStatusCode)
+        {
+            ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
+            navigationManager.NavigateTo("/");
+        }
 
     }
 

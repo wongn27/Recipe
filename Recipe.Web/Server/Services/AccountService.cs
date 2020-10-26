@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Recipe.Web.Data;
 using Recipe.Web.Data.Models;
@@ -31,6 +32,14 @@ namespace Recipe.Web.Server.Services
             return isLocked;
         }
 
+        public bool IsValidPassword(string nonHashedPassword)
+        {
+            // TODO Fix regex for next sprint
+            // var regex = new Regex(@"(?=^.{8,}$)(?=.*\w)(?=.*[0-9])");
+            //return !regex.IsMatch(nonHashedPassword);
+            return true;
+        }
+
         public void CreateAccount(User user)
         {
             if (HasAccount(user.Email))
@@ -38,6 +47,12 @@ namespace Recipe.Web.Server.Services
                 throw new ArgumentException($"The user account with email address {user.Email} exists.");
             }
 
+            if (!IsValidPassword(user.Password))
+            {
+                throw new Exception("The password provided is not valid. Must be a minimum length of 8 and at least one number!");
+            }
+
+            user.Email = user.Email.ToLower();
             user.Password = StringHasher.Hash(user.Password);
             
             context.Users.Attach(user);
