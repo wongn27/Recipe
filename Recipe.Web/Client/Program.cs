@@ -25,7 +25,7 @@ namespace Recipe.Web.Client
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddSyncfusionBlazor();
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-            builder.Services.AddBlazoredSessionStorage();
+            //builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddScoped<Blazored.SessionStorage.ISessionStorageService, Blazored.SessionStorage.SessionStorageService>();
             builder.Services.AddOptions();
             builder.Services.AddAuthorizationCore();

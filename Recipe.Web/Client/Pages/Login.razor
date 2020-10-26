@@ -12,7 +12,7 @@
 <h3>Login</h3>
 <br />
 <br />
-<EditForm Model="@user" OnValidSubmit="@ValidateUser">
+<EditForm Model="@user" OnValidSubmit="@LoginUser">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     
     <div class="col-12 row">
@@ -28,60 +28,41 @@
     <br />
     <div class="col-12 row">
         <span class="col-2"></span>
-        <input type="submit" class="form-control col-1 btn btn-primary" @onclick="ValidateUser" value="Login" />
-        <input type="submit" class="form-control col-1 btn btn-primary" @onclick="forgotClick" value="Forgot Username/Password" />
+        <input type="submit" class="form-control col-1 btn btn-primary" value="Login" />
+        <input type="submit" class="form-control col-1 btn btn-primary" @onclick="ForgotClick" value="Forgot Username/Password" />
                @*<button type="button" @onclick="ValidateUser">Log In</button>*@
         @*<button type="button" @onclick="forgotClick">Forgot Username/Password</button>*@
     </div>
 
 </EditForm>
 
-<p>@login</p>
 @code {
-    private User user;
+    private AuthenticateModel user;
 
     protected override async Task OnInitializedAsync()
     {
-        user = new User();
+        user = new AuthenticateModel();
 
         //var json = JsonSerializer.Serialize<User>(user);
         await sessionStorage.SetItemAsync("email", user.Email);
         var email = await sessionStorage.GetItemAsync<string>("email");
     }
 
-    private async Task<bool> ValidateUser()
+    private async Task LoginUser()
     {
         // Assume that user is valid
         // Check with database
         // Call some action that validates the user
 
-        ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
-        navigationManager.NavigateTo("/");
+        using var response = await httpClient.PostAsJsonAsync<AuthenticateModel>("/login", user);
 
-        return await Task.FromResult(true);
-    }
+        //((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
+        //navigationManager.NavigateTo("/");
 
-
-
-
-    //test strings, final version will compare to database -AL
-    private string email = "abc@123.com";
-    private string password = "1234567890";
-    private string check1;
-    private string check2;
-    private string login = "";
-
-    //login button event -AL
-    private void loginClick()
-    {
-        //if (string.Equals(email, check1) && string.Equals(password, check2))
-        //{ login = "Login successful"; }
-        //else
-        //{ login = "Login Failed"; }
     }
 
     //forgot account information button event -AL
-    private void forgotClick()
+    private void ForgotClick()
     {
         navigationManager.NavigateTo("/forgot");
 
