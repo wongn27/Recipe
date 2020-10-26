@@ -1,7 +1,7 @@
 ﻿@page "/register"
 @using Recipe.Web.Data.Models
 @inject HttpClient httpClient
-
+@inject NavigationManager navigationManager
 
 <h3>Registration</h3>
 <br />
@@ -26,12 +26,12 @@
     </div>
     <div class="col-12 row">
         <label class="col-2 font-weight-bold">Password:</label>
-        <InputText class="form-control col-3" @bind-Value="user.Password" placeholder="Password" />
+        <InputText class="form-control col-3" type="password" @bind-Value="user.Password" placeholder="Password" />
         &nbsp;<ValidationMessage For="@(() => user.Password)" />
     </div>
     <div class="col-12 row">
         <label class="col-2 font-weight-bold">Confirm Password:</label>
-        <InputText class="form-control col-3" @bind-Value="ConfirmPassword" placeholder="Confirm Password" />
+        <InputText class="form-control col-3" type="password" @bind-Value="ConfirmPassword" placeholder="Confirm Password" />
         &nbsp;<ValidationMessage For="@(() => user.Password)" />
     </div>
     <div class="col-12 row">
@@ -84,11 +84,11 @@
         using var response = await httpClient.PostAsJsonAsync("/account", user);
         if (response.IsSuccessStatusCode)
         {
-            // success
+            navigationManager.NavigateTo("/login");
         }
         else
         {
-            // failure
+            navigationManager.NavigateTo("/error");
         }
     }
 
