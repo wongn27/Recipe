@@ -21,7 +21,7 @@ namespace Recipe.Web.Server.Services
 
         public bool HasAccount(string email)
         {
-            var user = context.Users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var user = context.Users.FirstOrDefault(u => u.Email.Equals(email));
             return user != null;
         }
 
