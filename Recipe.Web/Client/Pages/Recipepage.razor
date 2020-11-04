@@ -9,25 +9,25 @@
     <br />
     <!--This section displays the Ingredients and the Steps in tables -AL-->
     <!--Setup will change in the future -AL-->
-    <div style="display: table" width="100%" margin: 0 auto>
-        <div style="display: table-row">
-            <div style="display: table-cell">
-                <ui class="ingredientList" float:left>
-                    <li>Ingredient 1</li>
-                    <li>Ingredient 2</li>
-                    <li>Ingredient 3</li>
-                </ui>
-            </div>
-            <div style="display: table-cell">
-                <ol class="steps" float:right>
-                    <li>Step 1: Do this</li>
-                    <li>Step 2: Do that</li>
-                    <li>Step 3: Do more stuff</li>
-                </ol>
-            </div>
-        </div>
-    </div>
+
+
+    <ui class="ingredientList" float:left>
+        @foreach (var x in iArray)
+        {
+            <li>@x</li>
+        }
+    </ui>
     <br />
+
+    <oi class="stepList">
+        @foreach (var y in sArray)
+        {
+            <li>@y</li>
+        }
+    </oi>
+
+
+<br />
 
 </body>
 <br />
@@ -36,20 +36,28 @@
 <textarea></textarea> <br />
     <button @onclick="reviewClick">Post Review</button>
     <br /> <br />
-    <button type="button" @onclick="printClick">Print</button>
-    <button type="button" @onclick="shareClick">Share</button>
+
+    <button onclick="window.print()">Download</button>
+    <!--<button type="button" @onclick="downloadClick">Download</button>-->
+    <!--<button type="button" @onclick="shareClick">Share</button>-->
     <button type="button" @onclick="saveClick">Save</button>
+    <br />
+
+</div>
+<br />
+<!--Social Media Links -AL -->
+<div>
+    <a href="https://facebook.com/sharer.php?u=https://localhost:44345/recipepage" target="_blank">Facebook</a>
+    <a href="https://twitter.com/intent/tweet?url=https://localhost:44345/recipepage" target="_blank">Twitter</a>
 </div>
 <p>Button Test: @testButtons</p>
 
 @code {
-    private string testButtons;
 
-    //print button event -AL
-    private void printClick()
-    {
-        testButtons = "print button pressed";
-    }
+    private string testButtons;
+    private string[] iArray = { "Ingredient 1", "Ingredient 2", "Ingredient 3" };
+    private string[] sArray = { "Step 1", "Step 2", "Step 3" };
+
 
     //share button event -AL
     private void shareClick()
