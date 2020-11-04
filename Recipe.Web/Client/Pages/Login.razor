@@ -1,4 +1,4 @@
-﻿@page "/login"
+@page "/login"
 @using Recipe.Web.Data
 @using Recipe.Web.Data.Models
 @using  Microsoft.AspNetCore.Components.Authorization
@@ -29,8 +29,10 @@
     <div class="col-12 row">
         <span class="col-2"></span>
         <input type="submit" class="form-control col-1 btn btn-primary" value="Login" />
+
         <input type="submit" class="form-control col-1 btn btn-primary" @onclick="ForgotClick" value="Forgot Username/Password" />
                @*<button type="button" @onclick="ValidateUser">Log In</button>*@
+
         @*<button type="button" @onclick="forgotClick">Forgot Username/Password</button>*@
     </div>
 
