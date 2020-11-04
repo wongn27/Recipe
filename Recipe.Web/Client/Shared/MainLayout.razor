@@ -1,15 +1,43 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider authenticationStateProvider
+@using Recipe.Web.Data
+@inject NavigationManager navigationManager
+@using Recipe.Web.Client.Pages
 
 <div class="sidebar">
     <NavMenu />
 </div>
 
 <div class="main">
+    @*<div class="top-row px-4">
+            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+        </div>*@
+
     <div class="top-row px-4">
-        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+        <AuthorizeView>
+            <Authorized>
+                <a href="/login" @onclick="(() => Logout())">Logout</a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login" @onclick="(() => Login())">Login</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 
     <div class="content px-4">
         @Body
     </div>
 </div>
+
+@code {
+    public void Logout()
+    {
+        ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+    }
+
+    public void Login()
+    {
+        navigationManager.NavigateTo("/login");
+    }
+}

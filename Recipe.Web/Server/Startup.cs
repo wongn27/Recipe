@@ -1,11 +1,17 @@
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Recipe.Web.Data;
+using Recipe.Web.Data.Models;
+using Recipe.Web.Server.Services;
 using System.Linq;
+using System.Net.Http;
+using Syncfusion.Blazor;
+
 
 namespace Recipe.Web.Server
 {
@@ -22,9 +28,26 @@ namespace Recipe.Web.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddControllersWithViews();
+            services.AddHttpClient();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            //Allows to use Syncfusion - RT
+            services.AddSyncfusionBlazor();
+            //Allows the same instance of a class to be shared across components - RT
+            services.AddSingleton<Data.Models.IngredientModel>();
+          
+            services
+                .AddScoped<RecipeContext>()
+                .AddScoped<AccountService>()
+                .AddScoped<LoginService>()
+                .AddScoped<AuthenticateModel>()
+                .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>()
+                .AddScoped<ISessionStorageService, SessionStorageService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,12 +64,15 @@ namespace Recipe.Web.Server
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
+
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
