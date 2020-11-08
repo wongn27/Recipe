@@ -1,12 +1,16 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Recipe.Web.Data.Models
 {
+    //https://spoonacular.com/food-api/docs#Search-Recipes-by-Ingredients - Site Reference
     public class RecipeModel
     {
+        [Parameter]
         public int id { get; set; }
+        [Parameter]
         public string title { get; set; }
         public string image { get; set; }
         public string imageType { get; set; }
@@ -59,6 +63,52 @@ namespace Recipe.Web.Data.Models
         public string title { get; set; }
         public string summary { get; set; }
     }
+
+
+    public class CookingInstructions
+    {
+        public string name { get; set; }
+        public StepRT[] steps { get; set; }
+    }
+
+    public class StepRT
+    {
+        public int number { get; set; }
+        public string step { get; set; }
+        public Ingredient[] ingredients { get; set; }
+        public Equipment[] equipment { get; set; }
+        public Length length { get; set; }
+    }
+
+    public class LengthRT
+    {
+        public int number { get; set; }
+        public string unit { get; set; }
+    }
+
+    public class Ingredient
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string localizedName { get; set; }
+        public string image { get; set; }
+    }
+
+    public class Equipment
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string localizedName { get; set; }
+        public string image { get; set; }
+        public Temperature temperature { get; set; }
+    }
+
+    public class Temperature
+    {
+        public float number { get; set; }
+        public string unit { get; set; }
+    }
+
 
 
 
