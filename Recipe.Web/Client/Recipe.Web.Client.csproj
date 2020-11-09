@@ -20,8 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+
     <Folder Include="Services\" />
     <Folder Include="wwwroot\favicons\" />
+
+    <Folder Include="bin\Debug\" />
+
   </ItemGroup>
 
 </Project>

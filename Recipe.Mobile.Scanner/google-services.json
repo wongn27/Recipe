@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "387252249570",
+    "firebase_url": "https://inthefridge-d99f1.firebaseio.com",
+    "project_id": "inthefridge-d99f1",
+    "storage_bucket": "inthefridge-d99f1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387252249570:android:92c0c76a8e466191e64fbb",
+        "android_client_info": {
+          "package_name": "com.inthefridge.recipe.mobile.scanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387252249570-anf113u38ptu6enh9n5cskej8k2u0oqo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnAP47lDfvm5K38GP-3zZPeZxv-Nfoft8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "387252249570-anf113u38ptu6enh9n5cskej8k2u0oqo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
