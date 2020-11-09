@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="25px"
+    android:minHeight="25px">
+    <Button
+        android:text="Login"
+        android:textSize="70px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="25px"
+        android:minHeight="100px"
+        android:id="@+id/loginButton"
+        android:layout_marginBottom="44.5dp"
+        android:layout_marginLeft="62.0dp"
+        android:layout_marginRight="46.0dp"
+        android:layout_marginTop="206.5dp" />
+
+
+    <EditText
+        android:layout_width="208.5dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/emailEditText"
+        android:layout_marginTop="43.5dp"
+        android:layout_marginLeft="158.0dp"
+        android:layout_marginRight="5.0dp" 
+       />
+
+    <TextView
+        android:text="Email"
+        android:textStyle="bold"
+        android:textSize="60px"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="154.0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/emailTextView"
+        android:layout_marginTop="47.5dp"
+        android:layout_marginLeft="11.0dp" />
+
+
+   
+    <EditText
+        android:layout_width="208.5dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/passwordEditText"
+        android:layout_marginTop="119.5dp"
+        android:layout_marginLeft="158.0dp"
+        android:layout_marginRight="5.0dp"/>
+
+    <TextView
+        android:text="Password"
+        android:textStyle="bold"
+        android:textSize="60px"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="154.0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/passwordTextView"
+        android:layout_marginTop="125.5dp"
+        android:layout_marginLeft="11.0dp" />
+
+    <Button
+        android:text="Register"
+        android:textSize="70px"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="25px"
+        android:minHeight="100px"
+        android:id="@+id/goToRegisterButton"        
+        android:layout_marginLeft="62.0dp"
+        android:layout_marginRight="46.0dp"
+        android:layout_marginTop="300.5dp"/>
+
+
+
+</RelativeLayout>

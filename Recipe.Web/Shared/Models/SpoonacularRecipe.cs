@@ -2,8 +2,10 @@
 
 namespace Recipe.Web.Data.Models
 {
+    
     public class SpoonacularRecipe
     {
+        
         [JsonPropertyName("vegetarian")]
         public bool Vegetarian { get; set; }
 
@@ -288,4 +290,5 @@ namespace Recipe.Web.Data.Models
         [JsonPropertyName("link")]
         public string Link { get; set; }
     }
+    
 }
