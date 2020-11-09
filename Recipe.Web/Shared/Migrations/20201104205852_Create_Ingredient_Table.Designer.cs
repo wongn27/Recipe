@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201104205852_Create_Ingredient_Table")]
+    partial class Create_Ingredient_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,59 +181,11 @@ namespace Recipe.Web.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserRecipePost", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("InTheFridgeRecipeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Rating")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Review")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id", "InTheFridgeRecipeId", "UserId");
-
-                    b.HasIndex("InTheFridgeRecipeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Users_RecipePost");
-                });
-
             modelBuilder.Entity("Recipe.Web.Data.Models.Ingredient", b =>
                 {
                     b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipe")
                         .WithMany()
                         .HasForeignKey("InTheFridgeRecipeId");
-                });
-
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserRecipePost", b =>
-                {
-                    b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipe")
-                        .WithMany()
-                        .HasForeignKey("InTheFridgeRecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Recipe.Web.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

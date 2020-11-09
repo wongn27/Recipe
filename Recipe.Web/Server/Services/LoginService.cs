@@ -21,48 +21,25 @@ namespace Recipe.Web.Server.Services
             this.accountService = accountService;
         }
 
-        public bool IsEmailValid(string email)
+        public bool DoesPasswordMatchHash(string email, string nonHashedPassword)
         {
-            Regex regex = new Regex(@"^\S +@\S +\.\S +$");
-           
-            if (!regex.IsMatch(email)) {
-                throw new ArgumentException("The email provided is not valid.");
-            }
-            return true;
-        }
-
-        public bool IsPasswordValid(string email, string nonHashedPassword)
-        {
-            Regex regex = new Regex(@"(?=^.{8,}$)(?=.*\w)(?=.*[0-9])");
-
-            if (!regex.IsMatch(nonHashedPassword))
-            {
-                throw new ArgumentException("The password provided is not valid. Must be a minimum length of 8 and at least one number");
-            }
-
-            if (!accountService.HasAccount(email))
-            {
-                throw new ArgumentException("The email does not exist in the system to authenticate against.");
-            }
-
-            var user = context.Users.First(e => e.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var user = context.Users.First(e => e.Email.Equals(email.ToLower()));
 
             var hashedPassword = StringHasher.Hash(nonHashedPassword);
-            return user.Password.Equals(hashedPassword);         
+            return user.Password.Equals(hashedPassword);
         }
 
         public bool Authenticate(string email, string password)
         {
-            if (!IsEmailValid(email))
+            try
             {
-                throw new ArgumentException("The email does not exist in the system.");
+                return DoesPasswordMatchHash(email, password);
             }
-
-            if (!IsPasswordValid(email, password))
+            catch (Exception e)
             {
-                throw new ArgumentException("The password entered does not match in the account.");
-            }
+                throw e;
 
+            }
             return true;
         }
     }

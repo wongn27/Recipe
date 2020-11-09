@@ -51,9 +51,9 @@ namespace Recipe.Web.Data
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
-        public void MarkUserAsLoggedOut()
+        public async Task MarkUserAsLoggedOut()
         {
-            _sessionStorageService.RemoveItemAsync("email");
+            await _sessionStorageService.RemoveItemAsync("email");
 
             var identity = new ClaimsIdentity();
 

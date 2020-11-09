@@ -15,6 +15,14 @@
     <Compile Remove="Migrations\20201011054537_Hello.Designer.cs" />
     <Compile Remove="Migrations\20201024041638_Add_More_Recipe_Columns.cs" />
     <Compile Remove="Migrations\20201024041638_Add_More_Recipe_Columns.Designer.cs" />
+    <Compile Remove="Migrations\20201104204225_Create_Ingredient_Table.cs" />
+    <Compile Remove="Migrations\20201104204225_Create_Ingredient_Table.Designer.cs" />
+    <Compile Remove="Migrations\20201104211520_Create_Table_UserRecipePost.cs" />
+    <Compile Remove="Migrations\20201104211520_Create_Table_UserRecipePost.Designer.cs" />
+    <Compile Remove="Migrations\20201104212157_Create_Table_UserRecipePost.cs" />
+    <Compile Remove="Migrations\20201104212157_Create_Table_UserRecipePost.Designer.cs" />
+    <Compile Remove="Migrations\20201104212551_Create_Table_UserRecipePost.cs" />
+    <Compile Remove="Migrations\20201104212551_Create_Table_UserRecipePost.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

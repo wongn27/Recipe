@@ -1,5 +1,6 @@
 ﻿using Recipe.Web.Data.Enums;
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 
@@ -15,6 +16,7 @@ namespace Recipe.Web.Data.Models
         [Required(ErrorMessage = "Email is required")]
         [MaxLength(50)]
         public string Email { get; set; }
+        [PasswordPropertyText]
         [Required(ErrorMessage = "Password is required")]
         [MaxLength(50)]
         public string Password { get; set; }

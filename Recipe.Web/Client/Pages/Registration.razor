@@ -1,83 +1,113 @@
 ﻿@page "/register"
-@using Recipe.Web.Data.Models 
+@using Recipe.Web.Data.Models
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
 
+<h3>Registration</h3>
+<br />
+<br />
 
-
-
-    <h3>Registration</h3>
+<EditForm Model="@user" OnValidSubmit="@RegisterUser">
+    <DataAnnotationsValidator />
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">First Name:</label>
+        <InputText class="form-control col-3" @bind-Value="user.FirstName" placeholder="First Name" />
+        &nbsp;<ValidationMessage For="@(() => user.FirstName)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Last Name:</label>
+        <InputText class="form-control col-3" @bind-Value="user.LastName" placeholder="Last Name" />
+        &nbsp;<ValidationMessage For="@(() => user.LastName)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Email:</label>
+        <InputText class="form-control col-3" @bind-Value="user.Email" placeholder="Email" />
+        &nbsp;<ValidationMessage For="@(() => user.Email)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Password:</label>
+        <InputText class="form-control col-3" type="password" @bind-Value="user.Password" placeholder="Password" />
+        &nbsp;<ValidationMessage For="@(() => user.Password)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Confirm Password:</label>
+        <InputText class="form-control col-3" type="password" @bind-Value="ConfirmPassword" placeholder="Confirm Password" />
+        &nbsp;<ValidationMessage For="@(() => user.Password)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Security Question:</label>
+        <InputText class="form-control col-3" @bind-Value="user.SecurityQuestion1" placeholder="Choose a security question" />
+        &nbsp;<ValidationMessage For="@(() => user.SecurityQuestion1)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Security Answer:</label>
+        <InputText class="form-control col-3" @bind-Value="user.SecurityAnswer1" placeholder="Security question answer" />
+        &nbsp;<ValidationMessage For="@(() => user.SecurityAnswer1)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Security Question:</label>
+        <InputText class="form-control col-3" @bind-Value="user.SecurityQuestion2" placeholder="Choose a security question" />
+        &nbsp;<ValidationMessage For="@(() => user.SecurityQuestion2)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-2 font-weight-bold">Security Answer:</label>
+        <InputText class="form-control col-3" @bind-Value="user.SecurityAnswer2" placeholder="Security question answer" />
+        &nbsp;<ValidationMessage For="@(() => user.SecurityAnswer2)" />
+    </div>
     <br />
-    <br />
-
-    <EditForm Model="@user" OnValidSubmit="@CreateAccount">
-        <DataAnnotationsValidator></DataAnnotationsValidator>
-        @*<div display: inline-block>
-            <input type ="email" id="email" @bind="check1" placeholder="Email"/>
-        </div>
-        <div display: inline-block>
-            <input type="password" id="password" @bind="check2" placeholder="Password" />
-        </div>*@
-
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">First Name:</label>
-            <InputText class="form-control col-3" @bind-Value="user.FirstName" placeholder="First Name" />
-            &nbsp;<ValidationMessage For="@(() => user.FirstName)" />
-        </div>
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">Last Name:</label>
-            <InputText class="form-control col-3" @bind-Value="user.LastName" placeholder="Last Name" />
-            &nbsp;<ValidationMessage For="@(() => user.LastName)" />
-        </div>
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">Email:</label>
-            <InputText class="form-control col-3" @bind-Value="user.Email" placeholder="Email" />
-            &nbsp;<ValidationMessage For="@(() => user.Email)" />
-        </div>
-        <div class="col-12 row">
-            <label class="col-2 font-weight-bold">Password:</label>
-            <InputText class="form-control col-3" @bind-Value="user.Password" placeholder="Password" />
-            &nbsp;<ValidationMessage For="@(() => user.Password)" />
-        </div>
-        <br />
-        <div class="col-12 row">
-            <span class="col-2"></span>
-            <input type="submit" class="form-control col-1 btn btn-primary" value="Create Account" />
-            @*<button type="button" @onclick="registerClick">Create Account</button>*@
-
-        </div>
-    </EditForm>
+    <div class="col-12 row">
+        <span class="col-2"></span>
+        <input type="submit" class="form-control col-1 btn btn-primary" value="Create Account" />
+    </div>
+</EditForm>
 
 
 
-    <p>@register</p>
-    @code {
-        private User user { get; set; }
+<p>@register</p>
+@code {
+    private User user { get; set; }
+    private string ConfirmPassword { get; set; }
+    protected override void OnInitialized()
+    {
+        user = new User();
+        ConfirmPassword = string.Empty;
+    }
 
-        protected override void OnInitialized()
+    private async Task RegisterUser()
+    {
+        if (!user.Password.Equals(ConfirmPassword))
         {
-            user = new User();
+            // throw validation saying password and confirm password dont match
+            return;
         }
 
-        private void CreateAccount()
+        using var response = await httpClient.PostAsJsonAsync("/account", user);
+        if (response.IsSuccessStatusCode)
         {
-
+            navigationManager.NavigateTo("/login");
         }
-
-
-
-        //test strings, final version will compare to database -AL
-        private string email = "abc@123.com";
-        private string password = "1234567890";
-        private string check1;
-        private string check2;
-        private string check3;
-        private string register = "";
-
-        //login button event -AL
-        private void registerClick()
+        else
         {
-            if (string.Equals(email, check1) && string.Equals(password, check2))
-            { register = "Registration successful"; }
-            else
-            { register = "Registration Failed"; }
+            navigationManager.NavigateTo("/error");
         }
     }
+
+
+
+    //test strings, final version will compare to database -AL
+    private string email = "abc@123.com";
+    private string password = "1234567890";
+    private string check1;
+    private string check2;
+    private string check3;
+    private string register = "";
+
+    //login button event -AL
+    private void registerClick()
+    {
+        if (string.Equals(email, check1) && string.Equals(password, check2))
+        { register = "Registration successful"; }
+        else
+        { register = "Registration Failed"; }
+    }
+}

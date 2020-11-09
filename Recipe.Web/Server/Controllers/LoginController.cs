@@ -40,28 +40,5 @@ namespace Recipe.Web.Server.Controllers
                 // e.Message
             }
         }
-
-        public async Task<ActionResult<bool>> ValidateUser(string email, string password)
-        {
-            if (accountService.HasAccount(email))
-            {
-                try
-                {
-                    var result = loginService.Authenticate(email, password);
-                    return Ok("fine");
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, "Error authenticating");
-                    return false;
-                }
-
-
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
     }
 }
