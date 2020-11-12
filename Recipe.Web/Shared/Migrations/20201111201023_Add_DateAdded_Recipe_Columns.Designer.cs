@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201111201023_Add_DateAdded_Recipe_Columns")]
+    partial class Add_DateAdded_Recipe_Columns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,6 +106,9 @@ namespace Recipe.Web.Data.Migrations
                     b.Property<Guid?>("InTheFridgeRecipeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("InTheFrigeRecipeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -185,31 +190,6 @@ namespace Recipe.Web.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserFridgeIngredient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Users_FridgeIngredient");
-                });
-
             modelBuilder.Entity("Recipe.Web.Data.Models.UserRecipePost", b =>
                 {
                     b.Property<Guid>("Id")
@@ -221,32 +201,17 @@ namespace Recipe.Web.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CookingTime")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Ingredients")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PictureUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Rating")
                         .HasColumnType("real");
 
                     b.Property<string>("Review")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Steps")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id", "InTheFridgeRecipeId", "UserId");
@@ -258,39 +223,11 @@ namespace Recipe.Web.Data.Migrations
                     b.ToTable("Users_RecipePost");
                 });
 
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserShoppingList", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Users_ShoppingList");
-                });
-
             modelBuilder.Entity("Recipe.Web.Data.Models.Ingredient", b =>
                 {
                     b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipe")
                         .WithMany()
                         .HasForeignKey("InTheFridgeRecipeId");
-                });
-
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserFridgeIngredient", b =>
-                {
-                    b.HasOne("Recipe.Web.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Recipe.Web.Data.Models.UserRecipePost", b =>
@@ -306,17 +243,6 @@ namespace Recipe.Web.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserShoppingList", b =>
-                {
-                    b.HasOne("Recipe.Web.Data.Models.Ingredient", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId");
-
-                    b.HasOne("Recipe.Web.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
