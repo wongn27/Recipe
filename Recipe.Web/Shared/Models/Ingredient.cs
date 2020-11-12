@@ -16,7 +16,7 @@ namespace Recipe.Web.Data.Models
         //[ForeignKey("RecipeRefId")]
         //public InTheFridgeRecipe InTheFridgeRecipe { get; set; }
 
-        public int InTheFrigeRecipeId { get; set; }
+        //public int InTheFrigeRecipeId { get; set; }
         public InTheFridgeRecipe InTheFridgeRecipe { get; set; }
 
     }
