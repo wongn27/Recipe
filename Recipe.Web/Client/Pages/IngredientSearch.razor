@@ -72,7 +72,7 @@ else
 
             <div class="card-footer text-center">
                 <a href="#" class="btn btn-primary m-1">View Recipe</a>
-                <button class="btn btn-primary m-1" @onclick="@(() => DisplayDescriptionButton(recipe.id))">Quick Description</button>
+                <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
                 @if (displaySummarizationButtonPressed == true)
                 {
                     <p> @summarizeRecipe.summary.ToString()</p>
@@ -98,7 +98,7 @@ else
     //Storing API link for easy access - RT
     private string ApiIngredientSearchLink = "https://api.spoonacular.com/food/ingredients/autocomplete?query=";
     //Setting number of results returned (Allowed 150/day for project) - RT
-    private int numOfResults = 1;
+    private int numOfResults = 3;
     //Path for ingredient image - NOTE: Needs object image file name at end. Can be found after search API but before rendering page - RT
     private string imageSourceIngredient = "https://spoonacular.com/cdn/ingredients_100x100/";
     //Recipe Summarize URL Starting string - RT
@@ -140,7 +140,7 @@ else
         {
 
             ingredients = await Http.GetFromJsonAsync<IngredientModel[]>
-    (ApiIngredientSearchLink + searchedIngredient.ToString() + "&number=" + numOfResults + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+    (ApiIngredientSearchLink + searchedIngredient.ToString() + "&number=" + numOfResults.ToString() + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         }
         foreach (var item in ingredients)
@@ -187,7 +187,7 @@ else
 
         //Calling the API here, and storing the Recipes in a list - RT
         foundRecipes = await Http.GetFromJsonAsync<RecipeModel[]>
-        (apiRecipeSearchStart + ingredientAllc + numOfRecipeResults + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+        (apiRecipeSearchStart + ingredientAllc + "&" + numOfRecipeResults + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         //Correcting image source URL. ALSO, getting count of missing ingredients for upcoming array - RT
         int missingIngCount = 0;
@@ -204,14 +204,14 @@ else
         recipeSearchButtonPressed = true;
 
     }
-
-    public async Task DisplayDescriptionButton(int recipeID)
+    /*
+    public async Task DisplayRecipe(int recipeID)
     {
         summarizeRecipe = await Http.GetFromJsonAsync<RecipeSummarize>
             (apiRecipeSummarize + recipeID + "/summary?&apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         displaySummarizationButtonPressed = true;
-    }
+    }*/
 
 }
 
