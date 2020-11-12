@@ -12,6 +12,10 @@ namespace Recipe.Web.Data.Models
         public string PictureUrl { get; set; }
         [Required]
         public string Name { get; set; }
+        [Required]
+        public string Unit { get; set; }
+        [Required]
+        public int Quantity { get; set; }
         public InTheFridgeRecipe InTheFridgeRecipe { get; set; }
 
     }
