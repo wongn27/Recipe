@@ -6,7 +6,7 @@ namespace Recipe.Web.Server.Services
 {
     public class RecipeMappingService
     {
-        public InTheFridgeRecipe MapSpoonacularRecipeToInTheFridgeRecipe(InTheFridgeRecipe original, SpoonacularRecipe spoon)
+        public void MapSpoonacularRecipeToInTheFridgeRecipe(InTheFridgeRecipe original, SpoonacularRecipe spoon)
         {
             original.Name = spoon.Title;
             original.Description = spoon.Summary;
@@ -34,7 +34,6 @@ namespace Recipe.Web.Server.Services
             var steps = original.Steps.Split(';');
 
             // do the rest of the properties for InTheFridgeRecipe
-            return original;
         }
 
     }
