@@ -86,7 +86,7 @@ namespace Recipe.Web.Data.Models
         public string unit { get; set; }
     }
 
-    public class Ingredient
+    public class IngredientInfo
     {
         public int id { get; set; }
         public string name { get; set; }
