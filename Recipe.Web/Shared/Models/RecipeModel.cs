@@ -75,7 +75,7 @@ namespace Recipe.Web.Data.Models
     {
         public int number { get; set; }
         public string step { get; set; }
-        public Ingredient[] ingredients { get; set; }
+        public IngredientInfo[] ingredients { get; set; }
         public Equipment[] equipment { get; set; }
         public Length length { get; set; }
     }
