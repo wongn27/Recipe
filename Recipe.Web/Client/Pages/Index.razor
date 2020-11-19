@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
-@using Recipe.Web.Data.Models
 @inject HttpClient Http
 
 
@@ -68,7 +67,7 @@ else
         if (searchedItem != null)
         {
             recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>
-            (ApiStarter + searchedItem.ToString() + ApiKey);
+            (ApiStarter + searchedItem.ToString() + "&number=1" + ApiKey);
             recipeSearchButtonPressed = true;
 
         }

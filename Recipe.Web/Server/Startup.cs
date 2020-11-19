@@ -35,6 +35,8 @@ namespace Recipe.Web.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            services.AddSingleton<HttpClient>();
+
             //Allows to use Syncfusion - RT
             services.AddSyncfusionBlazor();
             //Allows the same instance of a class to be shared across components - RT
