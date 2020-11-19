@@ -16,7 +16,7 @@ namespace Recipe.Web.Data.Models
         public string Unit { get; set; }
         [Required]
         public int Quantity { get; set; }
-        public InTheFridgeRecipe InTheFridgeRecipe { get; set; }
-
+        [Required]
+        public int InTheFridgeIngredientId { get; set; }
     }
 }
