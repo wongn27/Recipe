@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @inject HttpClient Http
@@ -11,9 +11,10 @@
         <p>Welcome, @context.User.Identity.Name</p>
     </Authorized>
     <NotAuthorized>
-        <p>You are signed out!!!</p>
+        <p>Please login or register an account!</p>
     </NotAuthorized>
 </AuthorizeView>
+
 @if (recipeTest == null)
 {
     <br />
@@ -22,6 +23,42 @@
            @bind="searchedItem" />
     <button type="button" @onclick="searchClick">Enter</button>
     <br />
+
+
+
+    <input type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable">
+    <label for="Sustainable"> Sustainable</label>
+    <br />
+
+    <input type="checkbox" id="Popular" name="Popular" value="Popular">
+    <label for="Popular"> Popular</label>
+    <br />
+
+    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap">
+    <label for="Cheap"> Cheap</label>
+    <br />
+
+    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy">
+    <label for="Healthy"> Healthy</label>
+    <br />
+
+    <input type="checkbox" id="Dairy Free" name="Dairy Free" value="Dairy Free">
+    <label for="Dairy Free"> Dairy Free</label>
+    <br />
+
+    <input type="checkbox" id="Gluten Free" name="Gluten Free" value="Gluten Free">
+    <label for="Gluten Free"> Gluten Free</label>
+
+    <br />
+    <input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
+    <label for="Vegan"> Vegan</label>
+    <br />
+
+    <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
+    <label for="Vegetarian"> Vegetarian</label>
+    <br />
+
+
 }
 
 else
@@ -40,11 +77,13 @@ else
                     <div class="card-footer text-center">
                         <a href="#" class="btn btn-primary m-1">Quick Description</a>
                         <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
-                       <!-- @if (displaySummarizationButtonPressed == true) -->
-                      //  {
-                     <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
-                     //   }
-   
+
+                        <!-- @if (displaySummarizationButtonPressed == true) -->
+                         //  {
+                        <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
+                        //   }
+
+
                     </div>
                 </div>
             }
@@ -73,3 +112,4 @@ else
         }
     }
 }
+
