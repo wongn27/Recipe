@@ -11,6 +11,101 @@
         <p>Welcome, @context.User.Identity.Name</p>
     </Authorized>
     <NotAuthorized>
-        <p>You are signed out!!!</p>
+        <p>Please login or register an account!</p>
     </NotAuthorized>
 </AuthorizeView>
+<<<<<<< Updated upstream
+=======
+@if (recipeTest == null)
+{
+    <br />
+    <br />
+    <input type="text"
+           @bind="searchedItem" />
+    <button type="button" @onclick="searchClick">Enter</button>
+    <br />
+
+
+    <input type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable">
+    <label for="Sustainable"> Sustainable</label>
+    <br />
+
+    <input type="checkbox" id="Popular" name="Popular" value="Popular">
+    <label for="Popular"> Popular</label>
+    <br />
+
+    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap">
+    <label for="Cheap"> Cheap</label>
+    <br />
+
+    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy">
+    <label for="Healthy"> Healthy</label>
+    <br />
+
+    <input type="checkbox" id="Dairy Free" name="Dairy Free" value="Dairy Free">
+    <label for="Dairy Free"> Dairy Free</label>
+    <br />
+
+    <input type="checkbox" id="Gluten Free" name="Gluten Free" value="Gluten Free">
+    <label for="Gluten Free"> Gluten Free</label>
+
+    <br />
+    <input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
+    <label for="Vegan"> Vegan</label>
+    <br />
+
+    <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
+    <label for="Vegetarian"> Vegetarian</label>
+    <br />
+}
+
+else
+{
+    if (recipeSearchButtonPressed == true)
+    {
+        <div class="card-deck">
+            @foreach (var recipe in recipeTest.results)
+            {
+                <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                    <div class="card-header">
+                        <h3>@recipe.title</h3>
+                    </div>
+                    <img class="card-img-top" src="@recipe.image" />
+
+                    <div class="card-footer text-center">
+                        <a href="#" class="btn btn-primary m-1">Quick Description</a>
+                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
+                        <!-- @if (displaySummarizationButtonPressed == true) -->
+                         //  {
+                        <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
+                        //   }
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+
+@code {
+
+    public string searchedItem { get; set; }
+    RootobjectRecipe recipeTest;
+    private string ApiStarter = "https://api.spoonacular.com/recipes/complexSearch?query=";
+    private string ApiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
+    private bool recipeSearchButtonPressed = false;
+
+    private async Task searchClick()
+    {
+
+        if (searchedItem != null)
+        {
+            recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>
+            (ApiStarter + searchedItem.ToString() + "&number=1" + ApiKey);
+            recipeSearchButtonPressed = true;
+
+        }
+    }
+}
+>>>>>>> Stashed changes
