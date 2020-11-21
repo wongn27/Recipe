@@ -22,5 +22,7 @@ namespace Recipe.Web.Data
         public DbSet<InTheFridgeRecipe> Recipes { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<UserRecipePost> Users_RecipePost { get; set; }
+        public DbSet<UserFridgeIngredient> Users_FridgeIngredient { get; set; }
+        public DbSet<UserShoppingList> Users_ShoppingList { get; set; }
     }
 }

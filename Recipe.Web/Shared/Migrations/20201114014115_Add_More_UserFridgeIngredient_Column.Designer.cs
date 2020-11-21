@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201114014115_Add_More_UserFridgeIngredient_Column")]
+    partial class Add_More_UserFridgeIngredient_Column
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,8 +103,8 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("InTheFridgeIngredientId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("InTheFridgeRecipeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -119,6 +121,8 @@ namespace Recipe.Web.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InTheFridgeRecipeId");
 
                     b.ToTable("Ingredients");
                 });
@@ -285,6 +289,13 @@ namespace Recipe.Web.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Users_ShoppingList");
+                });
+
+            modelBuilder.Entity("Recipe.Web.Data.Models.Ingredient", b =>
+                {
+                    b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipe")
+                        .WithMany()
+                        .HasForeignKey("InTheFridgeRecipeId");
                 });
 
             modelBuilder.Entity("Recipe.Web.Data.Models.UserFridgeIngredient", b =>

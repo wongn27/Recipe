@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201111211349_Add-More_UserRecipePost_Columns")]
+    partial class AddMore_UserRecipePost_Columns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,24 +103,19 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("InTheFridgeIngredientId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("InTheFridgeRecipeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PictureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Picture")
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InTheFridgeRecipeId");
 
                     b.ToTable("Ingredients");
                 });
@@ -159,8 +156,8 @@ namespace Recipe.Web.Data.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<string>("ProfilePicture")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("SecurityAnswer1")
                         .IsRequired()
@@ -204,9 +201,6 @@ namespace Recipe.Web.Data.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<string>("Unit")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -285,6 +279,13 @@ namespace Recipe.Web.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Users_ShoppingList");
+                });
+
+            modelBuilder.Entity("Recipe.Web.Data.Models.Ingredient", b =>
+                {
+                    b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipe")
+                        .WithMany()
+                        .HasForeignKey("InTheFridgeRecipeId");
                 });
 
             modelBuilder.Entity("Recipe.Web.Data.Models.UserFridgeIngredient", b =>

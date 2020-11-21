@@ -23,6 +23,8 @@
     <Compile Remove="Migrations\20201104212157_Create_Table_UserRecipePost.Designer.cs" />
     <Compile Remove="Migrations\20201104212551_Create_Table_UserRecipePost.cs" />
     <Compile Remove="Migrations\20201104212551_Create_Table_UserRecipePost.Designer.cs" />
+    <Compile Remove="Migrations\20201112015429_Add_More_Ingredient_Columns.cs" />
+    <Compile Remove="Migrations\20201112015429_Add_More_Ingredient_Columns.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

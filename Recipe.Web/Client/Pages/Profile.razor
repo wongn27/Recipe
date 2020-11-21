@@ -1,4 +1,6 @@
 ﻿@page "/profile"
+@using Recipe.Web.Data
+@using Recipe.Web.Data.Models
 <!--Outline of the user profile page -AL-->
 <h3>My Profile</h3>
 <img width="300" height="300" />
@@ -24,9 +26,23 @@
     private string buttonCheck = "";
     private string desc = "*My Description*"; //testing that description is edited when button is pressed
     private string imgSrc = "";
-    
-    private void editProfileClick()
+
+    public void editProfileClick()
     {
+        using RecipeContext recipeContext = new RecipeContext();
+
+        Ingredient ingredient = new Ingredient()
+        {
+            
+            Name = "Taco",
+            InTheFridgeIngredientId = 3424,
+            Quantity = 3,
+            Unit = "Unit"
+
+        };
+
+        recipeContext.Ingredients.Add(ingredient);
+        recipeContext.SaveChanges();
         buttonCheck = "edit profile button pressed";
     }
 

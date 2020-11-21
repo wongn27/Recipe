@@ -1,10 +1,10 @@
-﻿@page "/"
+@page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient Http
 
-<h1>Hello, world!</h1>
 
-<p>Welcome to your new app.</p>
+<h1>In The Fridge</h1>
 
 <AuthorizeView>
     <Authorized>
@@ -14,8 +14,7 @@
         <p>Please login or register an account!</p>
     </NotAuthorized>
 </AuthorizeView>
-<<<<<<< Updated upstream
-=======
+
 @if (recipeTest == null)
 {
     <br />
@@ -24,6 +23,7 @@
            @bind="searchedItem" />
     <button type="button" @onclick="searchClick">Enter</button>
     <br />
+
 
 
     <input type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable">
@@ -57,6 +57,8 @@
     <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
     <label for="Vegetarian"> Vegetarian</label>
     <br />
+
+
 }
 
 else
@@ -75,10 +77,12 @@ else
                     <div class="card-footer text-center">
                         <a href="#" class="btn btn-primary m-1">Quick Description</a>
                         <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
+
                         <!-- @if (displaySummarizationButtonPressed == true) -->
                          //  {
                         <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
                         //   }
+
 
                     </div>
                 </div>
@@ -108,4 +112,4 @@ else
         }
     }
 }
->>>>>>> Stashed changes
+

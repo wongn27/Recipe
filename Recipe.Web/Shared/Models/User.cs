@@ -36,7 +36,7 @@ namespace Recipe.Web.Data.Models
         [Required]
         [MaxLength(100)]
         public string SecurityAnswer2 { get; set; }
-        public byte[] ProfilePicture { get; set; }
+        public string ProfilePicture { get; set; }
         [Required (ErrorMessage = "First name is required")]
         [MaxLength(30)]
         public string FirstName { get; set; }

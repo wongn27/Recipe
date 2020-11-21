@@ -8,6 +8,7 @@ namespace Recipe.Web.Data.Models
     public class InTheFridgeRecipe
     {
         public Guid Id { get; set; }
+        public DateTime DateAdded { get; set; }
         [StringLength(100)]
         public string Name { get; set; }
         public string Description { get; set; }
@@ -18,6 +19,8 @@ namespace Recipe.Web.Data.Models
         public string Ingredients { get; set; }
         public string Instructions { get; set; }
         public string Steps { get; set; }
+        public float Rating { get; set; }
+        public string Review { get; set; }
         public int CalorieCount { get; set; }
         public int Servings { get; set; }
         public bool IsVegan { get; set; }

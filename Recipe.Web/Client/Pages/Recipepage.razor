@@ -4,7 +4,7 @@
 @using Recipe.Web.Data.Models
 
 
-@if (recipe == null)
+@if (recipeDetails == null)
 {
     <!--Pancake flip loading screen for a little *RAZZLE DAZZLE* NOTE: Need this "if null" check or info won't render async task- RT -->
     <img src="/images/Making-pancake-loader.gif" />
@@ -13,13 +13,15 @@
 
 else
 {
-    <h3>@title</h3> <p>Date Added: TBD</p>
+    <h3>@title</h3> <p>Date Added: TBD</p> 
+    //<p>Cooking Time: @recipeInformationBulk[0].RecipeDetails[0].readyInMinutes</p>
+    <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
     <br />
     <body>
 
 
         <!--Picture and Description section (default picture and description) -AL-->
-        <img src="@recipe.image" /> <p></p>
+        @*<img src="@recipe.image" /> <p></p>*@
         <br />
         <!--This section displays the Ingredients and the Steps in tables -AL-->
         <!--Setup will change in the future -AL-->
@@ -27,6 +29,7 @@ else
             <div style="display: table-row">
                 <div style="display: table-cell">
                     <ui class="ingredientList" float:left>
+                      
                         <li>ING</li>
                         <li>Ingredient 2</li>
                         <li>Ingredient 3</li>
@@ -52,7 +55,7 @@ else
         {
             <p>item.name</p>
         }*@
-        <p>@recipe.missedIngredientCount</p>
+        @*<p>@recipe.missedIngredientCount</p>*@
 <textarea></textarea> <br />
         <button @onclick="reviewClick">Post Review</button>
         <br /> <br />
@@ -66,7 +69,7 @@ else
 @code {
     //Need these two params to run through the page switch task. See @page statment top of page - RT
     [Parameter]
-    public int id { get; set; } = 559886; //Recipe ID
+    public int id { get; set; }  //Recipe ID
     [Parameter]
     public string title { get; set; } //Title of Recipe
 
@@ -78,24 +81,38 @@ else
     //Array Object of cooking instructions. "Cooking Instructions" variables can be found in "RecipeModel.cs" - RT
     CookingInstructions[] cookingInstructions;
     //Instance of RecipeModel to store recipe info (Not cooking instructions). See "RecipeModel.cs" for variables - RT
-    RecipeModel recipe = new RecipeModel();
+    RecipeModel recipe;// = new RecipeModel();
 
-    
+
+    RecipeDetails[] recipeDetails;
+    public string apiRecipeInformationBulkBaseUrl = "https://api.spoonacular.com/recipes/informationBulk?ids=";
+    public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
+
+
+
+
     //Async task to gather info before page is rendered. NOTE: If there is no "@if (recipe == null)" at the top, not all the information
     //will be gathered - RT
     protected override async Task OnInitializedAsync()
     {
+
         //Storing cooking instructions - RT
-        cookingInstructions = await Http.GetFromJsonAsync<CookingInstructions[]>(apiRecipeInstructionsLinkStart +
-        559886 + "/analyzedInstructions?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+        //cookingInstructions = await Http.GetFromJsonAsync<CookingInstructions[]>(apiRecipeInstructionsLinkStart +
+        //id + "/analyzedInstructions?apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         //Storing Recipe information - RT
-        recipe = await Http.GetFromJsonAsync<RecipeModel>(apiRecipeInstructionsLinkStart + 559886 +
-             "/information?includeNutrition=false&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
+        //recipe = await Http.GetFromJsonAsync<RecipeModel>(apiRecipeInstructionsLinkStart + this.id +
+        //     "/information?includeNutrition=false&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         //Correcting image link so it can be pulled from the correct database off API link - RT
-        recipe.image = imageSourceRecipe + 559886.ToString() + "-" + "480x360." + recipe.imageType.ToString();
-        
+        //recipe.image = imageSourceRecipe + id.ToString() + "-" + "480x360." + recipe.imageType.ToString();
+
+        recipeDetails = await Http.GetFromJsonAsync<RecipeDetails[]>(apiRecipeInformationBulkBaseUrl + id + apiKey);
+
+
+
+
+
     }
 
     private string testButtons;
