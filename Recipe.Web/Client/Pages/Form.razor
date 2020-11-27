@@ -1,0 +1,47 @@
+﻿@using Recipe.Web.Data.Models
+
+<EditForm Model="@ingredient" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>InTheFridgeID :</label>
+        <div>
+            <InputNumber @bind-Value="@ingredient.InTheFridgeIngredientId" />
+            <ValidationMessage For="@(() => ingredient.InTheFridgeIngredientId)" />
+        </div>
+    </div>
+    <div class="form-group ">
+        <div>
+            <label>Name :</label>
+            <div>
+                <InputText @bind-Value="@ingredient.Name" />
+                <ValidationMessage For="@(() => ingredient.Name)" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group ">
+        <div>
+            <label>Unit :</label>
+            <div>
+                <InputText @bind-Value="@ingredient.Unit" />
+                <ValidationMessage For="@(() => ingredient.Unit)" />
+            </div>
+        </div>
+    </div>
+    <div class="form-group ">
+        <div>
+            <label>Quantity :</label>
+            <div>
+                <InputNumber @bind-Value="@ingredient.Quantity" />
+                <ValidationMessage For="@(() => ingredient.Quantity)" />
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">
+        @ButtonText
+    </button>
+</EditForm>
+@code {
+    [Parameter] public Ingredient ingredient { get; set; }
+    [Parameter] public string ButtonText { get; set; } = "Save";
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+}

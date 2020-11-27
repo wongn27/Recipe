@@ -1,19 +1,114 @@
 ﻿@page "/profile"
 @using Recipe.Web.Data
 @using Recipe.Web.Data.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Syncfusion.Blazor
+
+@using System.Security.Claims
+@inject HttpClient client
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@if (userFridgeIngredientsDataGridList == null)
+{
+    <p>Cannot find your fridge</p>
+}
+<AuthorizeView>
+    <NotAuthorized>
+        <p>Please Login To View Profile</p>
+        <a class="btn btn-info" href="/login">Login</a>
+    </NotAuthorized>
+    <Authorized>
+        @if (currentUser == null)
+        {
+            <p>NULL</p>
+        }
+        else
+        {
+            <font size="7" face="arial" color="purple">
+               <i> <strong>Hello, @currentUser.FirstName.ToString()</strong></i>
+            </font>
+            <br />
+            <img src="/images/gordon-ramsay-hells-kitchen-02-2000.jpg" width="300" height="300" />
+        }
+        <br>
+        <br />
+        <font size="5" face="arial" color="purple">
+            <strong>Your Fridge</strong>
+        </font>
+        <SfGrid @ref="@grid" DataSource="@userFridgeIngredientsDataGridList" Height="210" Width="410" EnableHover="false" EnableVirtualization="true">
+            <GridColumns>
+                <GridColumn Field="Name"
+                            HeaderText="Name"
+                            TextAlign="TextAlign.Left"
+                            IsPrimaryKey="true"
+                            Width="90">
+                </GridColumn>
+                <GridColumn Field="Quantity"
+                            HeaderText="Quantity"
+                            TextAlign="TextAlign.Left"
+                            Width="90">
+                </GridColumn>
+
+                <GridColumn Field="Unit"
+                            HeaderText="Unit"
+                            TextAlign="TextAlign.Left"
+                            Width="90">
+                </GridColumn>
+                <GridColumn Field="Id"
+                            HeaderText="ID"
+                            Visible="false"
+                            TextAlign="TextAlign.Left"
+                            Width="90">
+                </GridColumn>
+
+                <GridColumn Type="ColumnType.CheckBox"
+                            Width="50">
+                </GridColumn>
+
+            </GridColumns>
+            <GridPageSettings PageSizes="true">
+
+            </GridPageSettings>
+            <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
+            <GridEvents RowSelected="GetSelectedRecords" TValue="UserFridgeIngredient"></GridEvents>
+        </SfGrid>
+        <button type="button" @onclick=ShowSelectedIngredients>Show Ingredients</button>
+        <a class="btn btn-success" href="/Search"><i class="oi oi-plus"></i> Seach for Ingredient To Add</a>
+        @if (ingCheck == true)
+        {
+
+            @foreach (var ing in IngredientsToSearchByList)
+            {
+                <p>@ing.Name</p>
+            }
+
+            ingCheck = false;
+        }
+    </Authorized>
+</AuthorizeView>
+
+
 <!--Outline of the user profile page -AL-->
-<h3>My Profile</h3>
+<!--<h3>My Profile</h3>
 <img width="300" height="300" />
 
 
 <br />
-<label>About Me</label> <br />
+<label>About Me</label>
+<br />
 <p id="Description">@desc</p>
 <br />
 
-<label>Email</label> <br />
-<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
-<label>Password</label> <button @onclick="changePassClick">Change Password</button><br />
+<label>Email</label>
+<br />
+<label>Username</label>
+<button @onclick="changeUserClick">Change Username</button>
+<br />
+<label>Password</label>
+<button @onclick="changePassClick">Change Password</button>
+<br />
 
 <label>My Recipes</label>
 <ul>
@@ -21,29 +116,147 @@
 </ul>
 
 <button type="button" @onclick="editProfileClick">Edit Profile</button>
-<p>@buttonCheck</p> 
+<p>@buttonCheck</p>-->
+
 @code {
+
+    //Using as a switch to display ingredients if they have been selected - RT
+    bool ingCheck = false;
+
+    //Instance to bring in Ingredients from Azure DB - RT
+    public UserFridgeIngredient[] userFridgeIngredients { get; set; }
+
+    //Instance to display in Grid USING SfGrud (Ingredients in Userfridge) - RT
+    public List<UserFridgeIngredient> userFridgeIngredientsDataGridList { get; set; }
+
+    //Email of current logged in user - RT
+    public string currentUserEmail { get; set; }
+
+    //User instance of current user logged in - RT
+    User currentUser { get; set; }
+
+    //Grid to display ingridents in Sf grid in razor above - RT
+    SfGrid<UserFridgeIngredient> grid;
+
+    //A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    public List<double> selectedRowIndexes { get; set; }
+
+    //A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    public double[] totalValue { get; set; }
+
+    ////A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    public string selectedValue;
+
+    //A List that is ONLY the ingredients the user checks off in the data grid - RT
+    List<UserFridgeIngredient> IngredientsToSearchByList = new List<UserFridgeIngredient>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Getting current user email that is logged in using our AuthenticationState - RT
+        var asyncUser = await ((CustomAuthenticationStateProvider)authenticationStateProvider).GetAuthenticationStateAsync();
+        var currentUserTemp = asyncUser.User;
+        string emailFromCustomAuth = currentUserTemp.Identity.Name;
+
+        //Getting current email of user logged in. This does the same as the code directly above. 
+        //Keeping both for testing purposes - RT
+        //NOTE - Added sessionStorage to the Login.razor page under (LoginUser Button). That line is needed for this to work - RT
+        currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+
+        //Using userController and passing in the email of current user to get all the credentials of the user - RT
+        //This is where we also get the GUID of the logged in user - RT
+        currentUser = await client.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+
+        //using userFridgeIngController + the GUID of the logged in user to get all the data from the
+        //UserFridgeIngredient table in Azure - RT
+        userFridgeIngredients = await client.GetFromJsonAsync<UserFridgeIngredient[]>("api/userFridgeIng/" + currentUser.Id);
+
+        //Taking the Ingredients from the UserFridge in the DB and adding them to the datagrid instance.
+        //Note the COPY of the Azure DB table is what is displayed to the user, not the DB table directly - RT
+        userFridgeIngredientsDataGridList = userFridgeIngredients.ToList();
+    }
+
+    public async Task GetSelectedRecords(RowSelectEventArgs<UserFridgeIngredient> args)
+    {
+        //selectedRowIndexes = await this.grid.GetSelectedRowIndexes();
+        //totalValue = selectedRowIndexes.ToArray();
+        //selectedValue = "";
+        //foreach (var data in totalValue)
+        //{
+        //    selectedValue = selectedValue + " " + data;
+        //}
+        StateHasChanged();
+    }
+
+    public async void ShowSelectedIngredients()
+    {
+        //Gets the Index of the selected rows in the Data grid- RT
+        var selectedRows = await grid.GetSelectedRowIndexes();
+
+        //Gets the data inside the row of selected rows in the Data grid - RT 
+        var selectedData =  this.grid.GetSelectedRecords();
+
+        //Waits for the 'selectedData' to be completed executing - RT 
+        //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
+        //Completed first. This is why we use OnCompleted)
+        selectedData.GetAwaiter().OnCompleted(() =>
+        {
+            //Getting data from selected rows and putting them in a new List - RT
+            List<UserFridgeIngredient> tempList =  selectedData.Result;
+
+            //Probably don't need, will test later - RT
+            StateHasChanged();
+
+            //This is to clear the list before the ingredients are added. Failsafe just in case the user
+            //removes items - RT
+            IngredientsToSearchByList.Clear();
+
+            //Addind the SELECTED ingredients to the list that will be used to serach for Recipes - RT
+            foreach (var t in tempList)
+            {
+                IngredientsToSearchByList.Add(new UserFridgeIngredient
+                {
+                    Name = t.Name,
+                    Id = t.Id,
+                    Quantity = t.Quantity,
+                    Unit = t.Unit
+                });
+            }
+            //Turning on switch to show seleted ingredients
+            ingCheck = true;
+            //Rerendering to show seleted ingredients each time
+            StateHasChanged();
+        });
+    }
+
+    public void AddIngredientsToFridgeButton()
+    {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private string buttonCheck = "";
     private string desc = "*My Description*"; //testing that description is edited when button is pressed
     private string imgSrc = "";
 
     public void editProfileClick()
     {
-        using RecipeContext recipeContext = new RecipeContext();
 
-        Ingredient ingredient = new Ingredient()
-        {
-            
-            Name = "Taco",
-            InTheFridgeIngredientId = 3424,
-            Quantity = 3,
-            Unit = "Unit"
-
-        };
-
-        recipeContext.Ingredients.Add(ingredient);
-        recipeContext.SaveChanges();
-        buttonCheck = "edit profile button pressed";
     }
 
     private void changeUserClick()

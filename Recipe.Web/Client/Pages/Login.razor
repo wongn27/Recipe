@@ -14,7 +14,7 @@
 <br />
 <EditForm Model="@user" OnValidSubmit="@LoginUser">
     <DataAnnotationsValidator></DataAnnotationsValidator>
-    
+
     <div class="col-12 row">
         <label class="col-2 font-weight-bold">Email:</label>
         <InputText class="form-control col-3" @bind-Value="user.Email" placeholder="Email" />
@@ -29,8 +29,8 @@
     <div class="col-12 row">
         <span class="col-2"></span>
         <input type="submit" class="form-control col-1 btn btn-primary" value="Login" />
-        
-        <input type="submit" class="form-control col-3 btn btn-primary" @onclick="ForgotClick" value="Forgot Username/Password"  />
+
+        <input type="submit" class="form-control col-3 btn btn-primary" @onclick="ForgotClick" value="Forgot Username/Password" />
         @*<button type="button" @onclick="ValidateUser">Log In</button>*@
 
         @*<button type="button" @onclick="forgotClick">Forgot Username/Password</button>*@
@@ -39,37 +39,41 @@
 </EditForm>
 
 @code {
-    private AuthenticateModel user;
+private AuthenticateModel user;
 
-    protected override async Task OnInitializedAsync()
+protected override async Task OnInitializedAsync()
+{
+    user = new AuthenticateModel();
+
+    //var json = JsonSerializer.Serialize<User>(user);
+    await sessionStorage.SetItemAsync("email", user.Email);
+    var email = await sessionStorage.GetItemAsync<string>("email");
+}
+
+private async Task LoginUser()
+{
+    // Assume that user is valid
+    // Check with database
+    // Call some action that validates the user
+
+    using var response = await httpClient.PostAsJsonAsync<AuthenticateModel>("/login", user);
+
+    if (response.IsSuccessStatusCode)
     {
-        user = new AuthenticateModel();
+        ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
 
-        //var json = JsonSerializer.Serialize<User>(user);
-        await sessionStorage.SetItemAsync("email", user.Email);
-        var email = await sessionStorage.GetItemAsync<string>("email");
+        //Adding email to session storage so it can be used across all pages - RT
+        await sessionStorage.SetItemAsync<string>("email", user.Email);        
+       
+        navigationManager.NavigateTo("/");
     }
 
-    private async Task LoginUser()
-    {
-        // Assume that user is valid
-        // Check with database
-        // Call some action that validates the user
+}
 
-        using var response = await httpClient.PostAsJsonAsync<AuthenticateModel>("/login", user);
+//forgot account information button event -AL
+private void ForgotClick()
+{
+    navigationManager.NavigateTo("/forgot");
 
-        if (response.IsSuccessStatusCode)
-        {
-            ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user.Email);
-            navigationManager.NavigateTo("/");
-        }
-
-    }
-
-    //forgot account information button event -AL
-    private void ForgotClick()
-    {
-        navigationManager.NavigateTo("/forgot");
-
-    }
+}
 }
