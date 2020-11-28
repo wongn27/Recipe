@@ -66,11 +66,6 @@ else
         </tbody>
     </table>
 
-    <!--ListBox for added Ingredients - RT-->
-    <!--<div class="control-wrapper">
-        <SfListBox TValue="string[]" DataSource="@saved" TItem="IngredientModel" @ref="ListBoxObj">
-            <ListBoxFieldSettings Text="name" Value="id"></ListBoxFieldSettings>
-        </SfListBox>-->
 
     <SfGrid @ref="@grid" DataSource="@ingredientsDataGridList" Height="210" Width="410" EnableHover="false" EnableVirtualization="true">
         <GridColumns>
@@ -105,14 +100,13 @@ else
 
         </GridPageSettings>
         <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
-        <GridEvents RowSelected="GetSelectedRecords" TValue="UserFridgeIngredient"></GridEvents>
+        <GridEvents TValue="UserFridgeIngredient"></GridEvents>
     </SfGrid>
     <button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>
-    <button type="button" @onclick="Check">CHECK</button>
+
 
 
     <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
-    @*</div>*@
 
     if (recipeSearchButtonPressed == true)
     {
@@ -158,20 +152,18 @@ else
     public List<UserFridgeIngredient> ingredientsDataGridList { get; set; }
     string currentUserEmail { get; set; }
     User currentUser { get; set; }
+    //Getting textbox ingredient from user - RT
+    public string searchedIngredient { get; set; }
+    //Storing API link for easy access - RT
+    private string ApiIngredientSearchLink = "https://api.spoonacular.com/food/ingredients/autocomplete?query=";
+    //Setting number of results returned (Allowed 150/day for project) - RT
+    private int numOfResults = 3;
+    //Path for ingredient image - NOTE: Needs object image file name at end. Can be found after search API but before rendering page - RT
+    private string imageSourceIngredient = "https://spoonacular.com/cdn/ingredients_100x100/";
+    //Recipe Summarize URL Starting string - RT
+    public string apiRecipeSummarize = "https://api.spoonacular.com/recipes/";
 
-    public async Task GetSelectedRecords(RowSelectEventArgs<UserFridgeIngredient> args)
-    {
-        //selectedRowIndexes = await this.grid.GetSelectedRowIndexes();
-        //totalValue = selectedRowIndexes.ToArray();
-        //selectedValue = "";
-        //foreach (var data in totalValue)
-        //{
-        //    selectedValue = selectedValue + " " + data;
-        //}
-        StateHasChanged();
-    }
-
-
+  
     protected override async Task OnInitializedAsync()
     {
 
@@ -179,12 +171,12 @@ else
         try
         {
             currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
-
         }
         catch
         {
-            currentUserEmail = "Not Logged in";
+            currentUserEmail = null;
         }
+
         try
         {
             //Using userController and passing in the email of current user to get all the credentials of the user - RT
@@ -196,31 +188,6 @@ else
 
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    SfListBox<string[], IngredientModel> ListBoxObj;
-
-    //Getting textbox ingredient from user - RT
-    public string searchedIngredient { get; set; }
-    //Storing API link for easy access - RT
-    private string ApiIngredientSearchLink = "https://api.spoonacular.com/food/ingredients/autocomplete?query=";
-    //Setting number of results returned (Allowed 150/day for project) - RT
-    private int numOfResults = 3;
-    //Path for ingredient image - NOTE: Needs object image file name at end. Can be found after search API but before rendering page - RT
-    private string imageSourceIngredient = "https://spoonacular.com/cdn/ingredients_100x100/";
-    //Recipe Summarize URL Starting string - RT
-    public string apiRecipeSummarize = "https://api.spoonacular.com/recipes/";
 
 
     //Creating list of ingredient class below. Code can be found in IngredientModel.cs - RT
@@ -237,7 +204,7 @@ else
 
 
     List<UserFridgeIngredient> userFridgeIngredients = new List<UserFridgeIngredient>();
-    string[] testUnit;
+
     //Adds the new SELECTED ingredient from "Add To Fridge" Button to ObservableCollection of Ingredient - RT
     public void AddSelectedIngToFridge(IngredientModel ingredient)
     {
@@ -250,42 +217,21 @@ else
             Name = ingredient.name,
             Quantity = seletedNumOfUnits,
             Unit = selectedUnit.ToString(),
-            //User = currentUser,
             UserId = currentUser.Id
-            
+
         }); ;
 
         ingredientsDataGridList = userFridgeIngredients.ToList();
-        //StateHasChanged();
-
-
-        ////Adding ingredient to collection -RT
-        //saved.Add(new IngredientModel
-        //{
-        //    id = ingredient.id,
-        //    image = ingredient.image,
-        //    name = ingredient.name,
-        //    aisle = ingredient.aisle,
-        //    possibleUnits = ingredient.possibleUnits
-        //});
     }
 
-    public void Check()
-    {
-        var test = userFridgeIngredients;
-        var test2 = ingredientsDataGridList;
-    }
 
     async Task SaveToDatabaseButton()
     {
-        UserFridgeIngredient test = userFridgeIngredients[0];
-        var response = await Http.PostAsJsonAsync("api/userFridgeIng", test);
+        foreach (var ing in userFridgeIngredients)
+        {
+            var response = await Http.PostAsJsonAsync("api/userFridgeIng", ing);
+        }
 
-        var statusCode = response.StatusCode;
-
-        string st = statusCode.ToString();
-
- 
     }
 
     //Button Click handler. Making sure textbox isn't empty first so won't break API - RT
@@ -369,14 +315,3 @@ else
         displaySummarizationButtonPressed = true;
     }*/
 }
-
-<!--Style Container for the "Fridge List" - RT-->
-<style>
-    .control-wrapper {
-        width: 250px;
-        margin-left: 35%;
-        margin-right: 35%;
-        margin-top: 12%;
-        margin-bottom: 15%;
-    }
-</style>
