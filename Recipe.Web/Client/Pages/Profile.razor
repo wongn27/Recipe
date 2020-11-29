@@ -7,21 +7,30 @@
 
 
 <br />
-<label>About Me</label> <br />
+<label>About Me</label>
+<br />
 <p id="Description">@desc</p>
 <br />
 
-<label>Email</label> <br />
-<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
-<label>Password</label> <button @onclick="changePassClick">Change Password</button><br />
+<label>Email</label>
+<br />
+@*<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
+    <label>Password</label> <button @onclick="changePassClick">Change Password</button><br />*@
+
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changeUserClick" value="Change Username" />
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changePassClick" value="Change Password" />
+<br />
+
 
 <label>My Recipes</label>
 <ul>
     <li>Recipe 1</li>
 </ul>
 
-<button type="button" @onclick="editProfileClick">Edit Profile</button>
-<p>@buttonCheck</p> 
+@*<button type="button" @onclick="editProfileClick">Edit Profile</button>*@
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="editProfileClick" value="Edit Profile" />
+
+<p>@buttonCheck</p>
 @code {
     private string buttonCheck = "";
     private string desc = "*My Description*"; //testing that description is edited when button is pressed
@@ -33,7 +42,7 @@
 
         Ingredient ingredient = new Ingredient()
         {
-            
+
             Name = "Taco",
             InTheFridgeIngredientId = 3424,
             Quantity = 3,
