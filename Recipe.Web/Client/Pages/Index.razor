@@ -9,6 +9,7 @@
 <AuthorizeView>
     <Authorized>
         <p>Welcome, @context.User.Identity.Name</p>
+        <p>Welcome, @Email</p>
     </Authorized>
     <NotAuthorized>
         <p>Please login or register an account!</p>
@@ -83,7 +84,6 @@ else
                         <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
                         <!--//   }-->
 
-
                     </div>
                 </div>
             }
@@ -99,9 +99,32 @@ else
     private string ApiStarter = "https://api.spoonacular.com/recipes/complexSearch?query=";
     private string ApiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
     private bool recipeSearchButtonPressed = false;
+    public string Email { get; set; }
+    public System.Security.Principal.IPrincipal User { get; set; }
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+
+    //List<Guid> list = new List<Guid>();
+    //User[] user { get; set; }
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    user = await Http.GetFromJsonAsync<User[]>("api/ingredientController");
+
+    //    var numbers2 = from u in ingredients
+    //                   where u.Name == "Taco"
+    //                   select u.Id;
+
+    //    list = numbers2.ToList();
+
+    //}
 
     private async Task searchClick()
     {
+
+        //var u = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        //var u2 = u.User;
+        //var name = u2.Identity.Name;
 
         if (searchedItem != null)
         {
