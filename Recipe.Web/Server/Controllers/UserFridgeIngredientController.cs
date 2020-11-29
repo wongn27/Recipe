@@ -32,7 +32,7 @@ namespace Recipe.Web.Server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var fridgeIngs = await _context.Users_FridgeIngredient.Where(a => a.User.Id == id).ToListAsync();
+            var fridgeIngs = await _context.Users_FridgeIngredient.Where(a => a.UserId == id).ToListAsync();
             return Ok(fridgeIngs);
         }
 
