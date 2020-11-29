@@ -9,7 +9,6 @@ namespace Recipe.Web.Data.Models
 {
     public class UserRecipePost
     {
-
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         [Required]
@@ -28,11 +27,5 @@ namespace Recipe.Web.Data.Models
         public bool IsGlutenFree { get; set; }
         public bool IsDairyFree { get; set; }
         public bool IsHealthy { get; set; }
-
-
-
-
     }
-   
-
 }
