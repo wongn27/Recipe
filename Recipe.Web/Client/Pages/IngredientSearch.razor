@@ -1,8 +1,7 @@
 ﻿@page "/Search"
 @using Recipe.Web.Data.Models
 @inject HttpClient Http
-
-
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 <h3>Ingredient Search</h3>
 
@@ -10,15 +9,27 @@
     <label>Ingredient: </label>
     <input type="text" @bind="searchedIngredient" />
 </div>
-@*<button type="button" @onclick="searchClick">Search</button>   old button*@
-<input type="submit" class="form-control col-1 btn btn-primary" @onclick="searchClick" value="Search" />
 
+@*<button type="button" @onclick="searchClick">Search</button>   old button*@
+@*<input type="submit" class="form-control col-1 btn btn-primary" @onclick="searchClick" value="Search" />*@
+
+
+<button type="button" @onclick="searchClick">Search</button>
+@if (currentUser == null)
+{
+    <p>Not Logged in</p>
+}
+else
+{
+    <p>Welcome, @currentUser.FirstName</p>
+}
 
 @if (ingredients == null)
 {
     <SfCalendar TValue="DateTime"></SfCalendar>
 
 }
+
 else
 {
     <table class="table">
@@ -29,6 +40,7 @@ else
                 <th>Name</th>
                 <th>Aisle</th>
                 <th>ID</th>
+                <th>Unit</th>
             </tr>
         </thead>
         <tbody>
@@ -41,22 +53,68 @@ else
                     <td>@i.name</td>
                     <td>@i.aisle</td>
                     <td>@i.id</td>
-                    <td><button type="button" @onclick="@(() => AddSelectedIngToFridge(i))">Add To Fridge</button></td>
+                    <td>
+                        <form action="/action_page.php" id="myForm2" method="get">
+                            <select id="units" name="units" @bind="selectedUnitType">
+                                @foreach (var k in i.possibleUnits)
+                                {
+                                    <option value="@k">@k</option>
+                                }
+                                <option value="starter" selected>Starter</option>
+                            </select>
+                        </form>
+                    </td>
+                    @*<td><input type="number" id="myNumber" @bind="seletedNumOfUnits" /></td>*@
+
+                    <td><button type="button" @onclick="@(() => AddSelectedIngToFridge(i))">Add To List</button></td>
                 </tr>
             }
-
         </tbody>
     </table>
-    <!--ListBox for added Ingredients - RT-->
-    <div class="control-wrapper">
-        <SfListBox TValue="string[]" DataSource="@saved" TItem="IngredientModel" @ref="ListBoxObj">
-            <ListBoxFieldSettings Text="name" Value="id"></ListBoxFieldSettings>
-        </SfListBox>
-        <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
-    </div>
+
+
+    <SfGrid @ref="@grid" DataSource="@ingredientsDataGridList" Height="210" Width="410" EnableHover="false" EnableVirtualization="true">
+        <GridColumns>
+            <GridColumn Field="Name"
+                        HeaderText="Name"
+                        TextAlign="TextAlign.Left"
+                        IsPrimaryKey="true"
+                        Width="90">
+            </GridColumn>
+            <GridColumn Field="Quantity"
+                        HeaderText="Quantity"
+                        TextAlign="TextAlign.Left"
+                        Width="90">
+            </GridColumn>
+            <GridColumn Field="Unit"
+                        HeaderText="Unit"
+                        TextAlign="TextAlign.Left"
+                        Width="90">
+            </GridColumn>
+            <GridColumn Field="Id"
+                        HeaderText="ID"
+                        Visible="false"
+                        TextAlign="TextAlign.Left"
+                        Width="90">
+            </GridColumn>
+            <GridColumn Type="ColumnType.CheckBox"
+                        Width="50">
+            </GridColumn>
+
+        </GridColumns>
+        <GridPageSettings PageSizes="true">
+
+        </GridPageSettings>
+        <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
+        <GridEvents TValue="UserFridgeIngredient"></GridEvents>
+    </SfGrid>
+    <button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>
+
+    <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
 
     if (recipeSearchButtonPressed == true)
     {
+
         <div class="card-deck">
             @foreach (var recipe in foundRecipes)
             {
@@ -92,9 +150,12 @@ else
 }
 
 @code {
-
-    SfListBox<string[], IngredientModel> ListBoxObj;
-
+    public string selectedUnitType { get; set; }
+    public int seletedNumOfUnits { get; set; }
+    public SfGrid<UserFridgeIngredient> grid;
+    public List<UserFridgeIngredient> ingredientsDataGridList { get; set; }
+    string currentUserEmail { get; set; }
+    User currentUser { get; set; }
     //Getting textbox ingredient from user - RT
     public string searchedIngredient { get; set; }
     //Storing API link for easy access - RT
@@ -107,6 +168,30 @@ else
     public string apiRecipeSummarize = "https://api.spoonacular.com/recipes/";
 
 
+    protected override async Task OnInitializedAsync()
+    {
+
+        //NOTE - Added sessionStorage to the Login.razor page under (LoginUser Button). That line is needed for this to work - RT
+        try
+        {
+            currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+        }
+        catch
+        {
+            currentUserEmail = null;
+        }
+
+        try
+        {
+            //Using userController and passing in the email of current user to get all the credentials of the user - RT
+            //This is where we also get the GUID of the logged in user - RT
+            currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+        }
+        catch
+        {
+
+        }
+    }
     //Creating list of ingredient class below. Code can be found in IngredientModel.cs - RT
     IngredientModel[] ingredients;
 
@@ -119,19 +204,35 @@ else
     //Dispaly Summarization Button press - RT
     bool displaySummarizationButtonPressed = false;
 
+    List<UserFridgeIngredient> userFridgeIngredients = new List<UserFridgeIngredient>();
 
     //Adds the new SELECTED ingredient from "Add To Fridge" Button to ObservableCollection of Ingredient - RT
     public void AddSelectedIngToFridge(IngredientModel ingredient)
     {
-        //Adding ingredient to collection -RT
-        saved.Add(new IngredientModel
+        StateHasChanged();
+        var selectedUnit = selectedUnitType;
+
+        userFridgeIngredients.Add(new UserFridgeIngredient
         {
-            id = ingredient.id,
-            image = ingredient.image,
-            name = ingredient.name,
-            aisle = ingredient.aisle,
-            possibleUnits = ingredient.possibleUnits
-        });
+
+            Name = ingredient.name,
+            Quantity = seletedNumOfUnits,
+            Unit = selectedUnit.ToString(),
+            UserId = currentUser.Id
+
+        }); ;
+
+        ingredientsDataGridList = userFridgeIngredients.ToList();
+    }
+
+
+    async Task SaveToDatabaseButton()
+    {
+        foreach (var ing in userFridgeIngredients)
+        {
+            var response = await Http.PostAsJsonAsync("api/userFridgeIng", ing);
+        }
+
     }
 
     //Button Click handler. Making sure textbox isn't empty first so won't break API - RT
@@ -214,16 +315,4 @@ else
 
         displaySummarizationButtonPressed = true;
     }*/
-
 }
-
-<!--Style Container for the "Fridge List" - RT-->
-<style>
-    .control-wrapper {
-        width: 250px;
-        margin-left: 35%;
-        margin-right: 35%;
-        margin-top: 12%;
-        margin-bottom: 15%;
-    }
-</style>

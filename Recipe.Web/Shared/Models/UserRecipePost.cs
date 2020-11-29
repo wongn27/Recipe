@@ -9,14 +9,7 @@ namespace Recipe.Web.Data.Models
 {
     public class UserRecipePost
     {
-        //[Key]
-        //[Column(Order = 1)]
         public Guid Id { get; set; }
-        //[Key]
-        //[Column(Order = 2)]
-        public Guid InTheFridgeRecipeId { get; set; }
-        //[Key]
-        //[Column(Order = 3)]
         public Guid UserId { get; set; }
         [Required]
         public string Name { get; set; }
@@ -27,13 +20,12 @@ namespace Recipe.Web.Data.Models
         public string Description { get; set; }
         public string Ingredients { get; set; }
         public string Steps { get; set; }
-        public float Rating { get; set; }
-        public string Review { get; set; }
-        public InTheFridgeRecipe InTheFridgeRecipe { get; set; }
-        public User User { get; set; }
-
-
+        public int CalorieCount { get; set; }
+        public int Servings { get; set; }
+        public bool IsVegan { get; set; }
+        public bool IsVegetarian { get; set; }
+        public bool IsGlutenFree { get; set; }
+        public bool IsDairyFree { get; set; }
+        public bool IsHealthy { get; set; }
     }
-   
-
 }

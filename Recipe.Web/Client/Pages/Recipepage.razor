@@ -7,16 +7,34 @@
 @if (recipeDetails == null)
 {
     <!--Pancake flip loading screen for a little *RAZZLE DAZZLE* NOTE: Need this "if null" check or info won't render async task- RT -->
-    <img src="/images/Making-pancake-loader.gif" />
+    <img src="/images/Making-pancake-loader.gif" width="300" height="300" />
 
 }
 
 else
 {
-    <h3>@title</h3> <p>Date Added: TBD</p> 
-    //<p>Cooking Time: @recipeInformationBulk[0].RecipeDetails[0].readyInMinutes</p>
+    <h3>@title</h3> <p>Date Added: TBD</p>
     <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
+    <img src="@recipeDetails[0].image" />
+    <p>@recipeDetails[0].summary</p>
+
+    for (int i = 0; i < recipeDetails[0].extendedIngredients.Length; i++)
+    {
+        <li>@recipeDetails[0].extendedIngredients[i].originalString</li>
+    }
+
     <br />
+
+    for (int i = 0; i < recipeDetails[0].analyzedInstructions.Length; i++)
+    {
+        <ol>@recipeDetails[0].analyzedInstructions[i].name</ol>
+
+        for (int s = 0; s < recipeDetails[0].analyzedInstructions[i].steps.Length; s++)
+        {
+            <ol>@recipeDetails[0].analyzedInstructions[i].steps[s].step</ol>
+        }
+    }
+
     <body>
 
 
@@ -28,18 +46,17 @@ else
         <div style="display: table" width="100%" margin: 0 auto>
             <div style="display: table-row">
                 <div style="display: table-cell">
-                    <ui class="ingredientList" float:left>
-                      
-                        <li>ING</li>
-                        <li>Ingredient 2</li>
-                        <li>Ingredient 3</li>
-                    </ui>
+                    <ul class="ingredientList" float:left>
+                        @*<li>@recipeDetails[0].extendedIngredients[0].amount</li>
+                            <li>@recipeDetails[0].extendedIngredients[0].name</li>
+                            <li>Ingredient 3</li>*@
+                    </ul>
                 </div>
                 <div style="display: table-cell">
                     <ol class="steps" float:right>
-                        <li>Step 1: Do this</li>
+                        @*<li>Step 1: Do this</li>
                         <li>Step 2: Do that</li>
-                        <li>Step 3: Do more stuff</li>
+                        <li>Step 3: Do more stuff</li>*@
                     </ol>
                 </div>
             </div>
@@ -52,9 +69,9 @@ else
         <h6>Reviews</h6>
         <p>@id</p>
         @*@foreach (var item in recipe.missedIngredients)
-        {
-            <p>item.name</p>
-        }*@
+            {
+                <p>item.name</p>
+            }*@
         @*<p>@recipe.missedIngredientCount</p>*@
 <textarea></textarea> <br />
         <button @onclick="reviewClick">Post Review</button>
@@ -109,11 +126,9 @@ else
 
         recipeDetails = await Http.GetFromJsonAsync<RecipeDetails[]>(apiRecipeInformationBulkBaseUrl + id + apiKey);
 
-
-
-
-
     }
+
+
 
     private string testButtons;
 

@@ -111,15 +111,15 @@ namespace Recipe.Web.Data.Models
         public class Analyzedinstruction
         {
             public string name { get; set; }
-            public Step[] steps { get; set; }
+            public Step2[] steps { get; set; }
         }
 
         public class Step2
         {
             public int number { get; set; }
             public string step { get; set; }
-            public Ingredient[] ingredients { get; set; }
-            public Equipment[] equipment { get; set; }
+            public Ingredient2[] ingredients { get; set; }
+            public Equipment2[] equipment { get; set; }
         }
 
         public class Ingredient2

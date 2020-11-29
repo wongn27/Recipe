@@ -11,7 +11,8 @@ using Recipe.Web.Server.Services;
 using System.Linq;
 using System.Net.Http;
 using Syncfusion.Blazor;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace Recipe.Web.Server
 {
@@ -41,7 +42,9 @@ namespace Recipe.Web.Server
             services.AddSyncfusionBlazor();
             //Allows the same instance of a class to be shared across components - RT
             services.AddSingleton<Data.Models.IngredientModel>();
-          
+
+           services.AddDbContext<RecipeContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+           
             services
                 .AddScoped<RecipeContext>()
                 .AddScoped<AccountService>()
