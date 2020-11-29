@@ -19,7 +19,7 @@ namespace Recipe.Web.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserRecipePost>()
-                .HasKey(x => new { x.Id, x.InTheFridgeRecipeId, x.UserId });
+                .HasKey(x => new { x.Id, x.UserId });
         }
         
         public DbSet<User> Users { get; set; }

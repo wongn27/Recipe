@@ -9,6 +9,7 @@
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager navigationManager
 
 @if (userFridgeIngredientsDataGridList == null)
 {
@@ -30,15 +31,15 @@
                 <i> <strong>Hello, @currentUser.FirstName.ToString()</strong></i>
             </font>
             <br />
-            <img src="/images/gordon-ramsay-hells-kitchen-02-2000.jpg" width="300" height="300" />
+            <img src="/android-chrome-512x512.png" width="300" height="300" />
         }
         <br>
         <br />
         <font size="5" face="arial" color="purple">
             <strong>Your Fridge</strong>
         </font>
-        <SfGrid @ref="@grid" DataSource="@userFridgeIngredientsDataGridList" Height="210" Width="450" EnableHover="false" 
-              AllowSorting="true" EnableVirtualization="true" Toolbar="@toolBarItems">
+        <SfGrid @ref="@grid" DataSource="@userFridgeIngredientsDataGridList" Height="210" Width="450" EnableHover="false"
+                AllowSorting="true" EnableVirtualization="true" Toolbar="@toolBarItems">
             <GridEditSettings AllowEditing="true" AllowDeleting="true"></GridEditSettings>
             <GridColumns>
                 <GridColumn Field="Name"
@@ -86,7 +87,8 @@
             <GridEvents RowDeselected="GetRowsDropped" RowSelected="GetSelectedRecords" TValue="UserFridgeIngredient"></GridEvents>
         </SfGrid>
         <a class="btn btn-success" href="/Search"><i class="oi oi-plus"></i> Seach for Ingredient To Add</a>
-        <a class="btn btn-success" href="/Search"><i class="oi oi-circle-check"></i> @totalIngsSelected Seach for Recipes</a>
+        <button type="button" class="btn btn-success" @onclick="showRecipes"><i class="oi oi-circle-check"></i> @totalIngsSelected Seach for Recipes</button>
+
         @if (ingCheck == true)
         {
 
@@ -104,7 +106,7 @@
 @code {
 
     //Toolbar for Datagrid - RT
-    public string[] toolBarItems = new string[] { "Edit", "Delete", "Update"  };
+    public string[] toolBarItems = new string[] { "Edit", "Delete", "Update" };
 
     //Storing number of Ingredients selected for Search button - RT
     public int totalIngsSelected { get; set; } = 0;
@@ -146,7 +148,7 @@
         var currentUserTemp = asyncUser.User;
         string emailFromCustomAuth = currentUserTemp.Identity.Name;
 
-        //Getting current email of user logged in. This does the same as the code directly above. 
+        //Getting current email of user logged in. This does the same as the code directly above.
         //Keeping both for testing purposes - RT
         //NOTE - Added sessionStorage to the Login.razor page under (LoginUser Button). That line is needed for this to work - RT
         currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
@@ -169,10 +171,10 @@
         //Gets the Index of the selected rows in the Data grid- RT
         var selectedRows = await grid.GetSelectedRowIndexes();
 
-        //Gets the data inside the row of selected rows in the Data grid - RT 
+        //Gets the data inside the row of selected rows in the Data grid - RT
         var selectedData = this.grid.GetSelectedRecords();
 
-        //Waits for the 'selectedData' to be completed executing - RT 
+        //Waits for the 'selectedData' to be completed executing - RT
         //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
         //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
@@ -221,10 +223,10 @@
         //Gets the Index of the selected rows in the Data grid- RT
         var selectedRows = await grid.GetSelectedRowIndexes();
 
-        //Gets the data inside the row of selected rows in the Data grid - RT 
+        //Gets the data inside the row of selected rows in the Data grid - RT
         var selectedData = this.grid.GetSelectedRecords();
 
-        //Waits for the 'selectedData' to be completed executing - RT 
+        //Waits for the 'selectedData' to be completed executing - RT
         //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
         //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
@@ -268,15 +270,39 @@
         StateHasChanged();
     }
 
+    public async Task showRecipes()
+    {
+        //Pulling all recipe data in as string first - RT
+        string ingredientAllc = "";
+        //Counter so we know when not to add a plus sign for search string - RT
+        int ingredientNum = 1;
+
+        //Loop to create the correct recipe search string for the API - RT
+        foreach (var ingredient in IngredientsToSearchByList)
+        {
+            ingredientAllc += ingredient.Name;
+
+            if (ingredientNum != IngredientsToSearchByList.Count)
+            {
+                ingredientAllc += ",+";
+            }
+            ingredientNum++;
+        }
+        
+        await sessionStorage.SetItemAsync<string>("ingredientList", ingredientAllc);
+
+        navigationManager.NavigateTo("/recipefromprofile");
+    }
+
     //public async void ShowSelectedIngredients()
     //{
     //    //Gets the Index of the selected rows in the Data grid- RT
     //    var selectedRows = await grid.GetSelectedRowIndexes();
 
-    //    //Gets the data inside the row of selected rows in the Data grid - RT 
+    //    //Gets the data inside the row of selected rows in the Data grid - RT
     //    var selectedData =  this.grid.GetSelectedRecords();
 
-    //    //Waits for the 'selectedData' to be completed executing - RT 
+    //    //Waits for the 'selectedData' to be completed executing - RT
     //    //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
     //    //Completed first. This is why we use OnCompleted)
     //    selectedData.GetAwaiter().OnCompleted(() =>

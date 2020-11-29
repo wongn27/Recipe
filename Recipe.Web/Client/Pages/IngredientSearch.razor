@@ -104,8 +104,6 @@ else
     </SfGrid>
     <button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>
 
-
-
     <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
 
     if (recipeSearchButtonPressed == true)
@@ -163,7 +161,7 @@ else
     //Recipe Summarize URL Starting string - RT
     public string apiRecipeSummarize = "https://api.spoonacular.com/recipes/";
 
-  
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -188,8 +186,6 @@ else
 
         }
     }
-
-
     //Creating list of ingredient class below. Code can be found in IngredientModel.cs - RT
     IngredientModel[] ingredients;
 
@@ -201,7 +197,6 @@ else
 
     //Dispaly Summarization Button press - RT
     bool displaySummarizationButtonPressed = false;
-
 
     List<UserFridgeIngredient> userFridgeIngredients = new List<UserFridgeIngredient>();
 
