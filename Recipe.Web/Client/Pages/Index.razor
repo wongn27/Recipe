@@ -9,7 +9,7 @@
 <AuthorizeView>
     <Authorized>
         <p>Welcome, @context.User.Identity.Name</p>
-        <p>Welcome, @Email</p>
+        @*<p>Welcome, @Email</p>  does not display anything*@
     </Authorized>
     <NotAuthorized>
         <p>Please login or register an account!</p>
@@ -22,11 +22,16 @@
     <br />
     <input type="text"
            @bind="searchedItem" />
+<<<<<<< Updated upstream
 
     @*<button type="button" @onclick="searchClick">Enter</button>     old button*@    
 
-    <input type="submit" class="form-control col-1 btn btn-primary" @onclick="searchClick" value="Enter" /> 
+    <input type="submit" class="form-control col-1 btn btn-primary" @onclick="searchClick" value="Search for Recipe" /> 
 
+=======
+    <button type="button" @onclick="searchClick">Search For Recipe</button>
+    
+>>>>>>> Stashed changes
     <br />
 
 
