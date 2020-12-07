@@ -49,18 +49,6 @@
             </font>
             <br />
             <img src="/android-chrome-512x512.png" width="300" height="300" />
-           
-            @if (userRecipePosts != null)
-            { 
-            <font size="5" face="arial" color="purple">
-                <p><strong>Your Created Recipes</strong></p>
-                @for(int i = 0; i <  userRecipePosts.Length; i++)
-                {
-                    int number = i + 1;
-                   <ol>@number . @userRecipePosts[i].Name    </ol>
-                }
-            </font>
-            }
         }
         <br>
         <br />
@@ -127,7 +115,7 @@
 
 @code {
 
-    //Toolbar for Datagrid - RT
+        //Toolbar for Datagrid - RT
     public string[] toolBarItems = new string[] { "Edit", "Delete", "Update" };
 
     //Storing number of Ingredients selected for Search button - RT
@@ -160,9 +148,6 @@
     //A List that is ONLY the ingredients the user checks off in the data grid - RT
     List<UserFridgeIngredient> IngredientsToSearchByList = new List<UserFridgeIngredient>();
 
-    //Object to get recipes that user uploaded
-    UserRecipePost[] userRecipePosts { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,10 +172,6 @@
         //Taking the Ingredients from the UserFridge in the DB and adding them to the datagrid instance.
         //Note the COPY of the Azure DB table is what is displayed to the user, not the DB table directly - RT
         userFridgeIngredientsDataGridList = userFridgeIngredients.ToList();
-
-
-        //Gets UserRecipePosts if there are any and stores them in an object - RT
-        userRecipePosts = await client.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController/" + currentUser.Id);
     }
 
     public async Task GetRowsDropped(RowDeselectEventArgs<UserFridgeIngredient> args)

@@ -28,7 +28,7 @@ namespace Recipe.Web.Server.Controllers
         }
 
 
-        //GET - Get all ingredient stored in the context based on user Guid - RT
+        //GET - Get one ingredient stored in the context - RT
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
