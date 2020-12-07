@@ -28,7 +28,7 @@ namespace Recipe.Web.Server.Controllers
         }
 
 
-        //GET - Get all the ingredients stored in the context - RT
+        //GET - Get one ingredient stored in the context - RT
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -55,10 +55,10 @@ namespace Recipe.Web.Server.Controllers
         }
 
         //DELETE - Deletes a ingredient record by Name - RT
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string name)
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var userIngredient = new UserFridgeIngredient { Name = name };
+            var userIngredient = new UserFridgeIngredient { Id = id };
             _context.Remove(userIngredient);
             await _context.SaveChangesAsync();
             return NoContent();

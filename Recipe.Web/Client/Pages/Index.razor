@@ -1,6 +1,7 @@
 @page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager navigationManager
 @inject HttpClient Http
 
 
@@ -22,8 +23,14 @@
     <br />
     <input type="text"
            @bind="searchedItem" />
+
  
     <button type="button" @onclick="searchClick">Search for Recipe</button>
+
+    <br />
+    <button type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
+    <br />
+
 
     <br />
 
@@ -52,17 +59,30 @@
     <label for="Gluten Free"> Gluten Free</label>
 
     <br />
-    <input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
-    <label for="Vegan"> Vegan</label>
-    <br />
+    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
+        <label for="Vegan"> Vegan</label>
+        <br />*@
 
     <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
     <label for="Vegetarian"> Vegetarian</label>
     <br />
 
+    // @if (isSelected)
+    //{
+    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="LoadVeganRecipes" bind="@isSelected" checked @onclick="LoadVeganRecipes"/>
+        <label for="Vegan"> Vegan</label>*@
+    //}
+    @*else
+        {
+            <input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="@(async (e) => await ToggleSelectedAsync(false))" />
+            <label for="Vegan"> Vegan</label>
+        }*@
+    <br />
+    <input type="checkbox" class="form-check-input" @onchange="CheckChanged"/>
+    <label for="Test"> Test</label>
+    <p>@checkChanged</p>
 
 }
-
 else
 {
     if (recipeSearchButtonPressed == true)
@@ -91,18 +111,92 @@ else
         </div>
     }
 }
+@if (funFact == null)
+{
 
+}
+else
+{
+    <br/>
+    <h2>Did you know: @funFact.text</h2>
+}
 
 @code {
 
     public string searchedItem { get; set; }
     RootobjectRecipe recipeTest;
+    RootobjectRandom randomRecipe;
     private string ApiStarter = "https://api.spoonacular.com/recipes/complexSearch?query=";
     private string ApiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
     private bool recipeSearchButtonPressed = false;
+    private bool reandomRecipeButtonPressed = false;
     public string Email { get; set; }
+    FunFact funFact;
     public System.Security.Principal.IPrincipal User { get; set; }
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        funFact = await Http.GetFromJsonAsync<FunFact>
+            ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+    }
+
+    RecipeResults[] recipeResults;
+    public string apiRecipeComplexSearchBaseUrl = "https://api.spoonacular.com/recipes/complexSearch";
+    public string apiAddRecipeInfoParam = "?addRecipeInformation=true";
+    public string returnSingleResult = "&number=1";
+    public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
+
+    //public bool isSelected = true;
+
+    private string checkChanged = "I am not checked";
+    [Parameter]
+    public bool isChecked { get; set; } = true;
+
+    private void CheckChanged()
+    //private List<RecipeResults> CheckChanged()
+    {
+        //List<RecipeResults> veganRecipes = new List<RecipeResults>();
+
+        if (!isChecked)
+        {
+            checkChanged = "Unchecked now!!";
+            isChecked = !isChecked;
+        }
+        else
+        {
+            checkChanged = "You have checked me now!!";
+            isChecked = !isChecked;
+
+            //veganRecipes = recipeResults.Where(x => x.vegan == true).ToList();
+
+        }
+
+        //return veganRecipes;
+    }
+
+
+    //protected override async Task OnInitializedAsync()
+  //  {
+  //      recipeResults = await Http.GetFromJsonAsync<RecipeResults[]>(apiRecipeComplexSearchBaseUrl + apiAddRecipeInfoParam + returnSingleResult + apiKey);
+  //  }
+
+    //private List<RecipeResults> LoadVeganRecipes(ChangeEventArgs e)
+    ////protected List<RecipeResults> LoadVeganRecipes()
+    //{
+    //    //if (isSelected)
+    //    //{
+    //    //var veganRecipes = recipeResults.Where<RecipeResults>(Func<RecipeResults, bool> )
+    //    //IEnumerable<RecipeResults> veganRecipes = from recipe in recipeResults
+    //    //                                          where recipe.vegan is true
+    //    //                                          select recipe;
+
+    //    List<RecipeResults> veganRecipes = recipeResults.Where(x => x.vegan).ToList();
+    //    return veganRecipes;
+    //    //}
+    //}
 
 
     //List<Guid> list = new List<Guid>();
@@ -122,7 +216,6 @@ else
 
     private async Task searchClick()
     {
-
         //var u = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         //var u2 = u.User;
         //var name = u2.Identity.Name;
@@ -134,6 +227,17 @@ else
             recipeSearchButtonPressed = true;
 
         }
+    }
+
+    private async Task randomRecipeButton()
+    {
+        randomRecipe = await Http.GetFromJsonAsync<RootobjectRandom>
+            ("https://api.spoonacular.com/recipes/random?number=1" + ApiKey);
+
+        int recipeID = randomRecipe.recipes[0].id;
+        string recipeTitle = randomRecipe.recipes[0].title;
+        navigationManager.NavigateTo("/recipepage/" + recipeID.ToString() + "/" + recipeTitle);
+
     }
 }
 

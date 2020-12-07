@@ -57,7 +57,9 @@
         </font>
         <SfGrid @ref="@grid" DataSource="@userFridgeIngredientsDataGridList" Height="210" Width="450" EnableHover="false"
                 AllowSorting="true" EnableVirtualization="true" Toolbar="@toolBarItems">
-            <GridEditSettings AllowEditing="true" AllowDeleting="true"></GridEditSettings>
+            <GridEditSettings AllowEditing="true" AllowDeleting="true" Mode="EditMode.Batch" ShowDeleteConfirmDialog="true"></GridEditSettings>
+            <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
+            <GridEvents OnBatchDelete="BatchDeleteEvent" RowDeselected="GetRowsDropped" RowSelected="GetSelectedRecords" TValue="UserFridgeIngredient"></GridEvents>
             <GridColumns>
                 <GridColumn Field="Name"
                             HeaderText="Name"
@@ -98,24 +100,11 @@
 
             </GridColumns>
             <GridPageSettings PageSizes="true">
-
             </GridPageSettings>
-            <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
-            <GridEvents RowDeselected="GetRowsDropped" RowSelected="GetSelectedRecords" TValue="UserFridgeIngredient"></GridEvents>
         </SfGrid>
-        <a class="btn btn-success" href="/Search"><i class="oi oi-plus"></i> Seach for Ingredient To Add</a>
+        <a class="btn btn-success" href="/Search"><i class="oi oi-plus"></i> Seach Ingredient To Add</a>
         <button type="button" class="btn btn-success" @onclick="showRecipes"><i class="oi oi-circle-check"></i> @totalIngsSelected Seach for Recipes</button>
 
-        @if (ingCheck == true)
-        {
-
-            @foreach (var ing in IngredientsToSearchByList)
-            {
-                <p>@ing.Name</p>
-            }
-
-            ingCheck = false;
-        }
     </Authorized>
 </AuthorizeView>
 
@@ -126,14 +115,11 @@
 
 @code {
 
-    //Toolbar for Datagrid - RT
+        //Toolbar for Datagrid - RT
     public string[] toolBarItems = new string[] { "Edit", "Delete", "Update" };
 
     //Storing number of Ingredients selected for Search button - RT
     public int totalIngsSelected { get; set; } = 0;
-
-    //Using as a switch to display ingredients if they have been selected - RT
-    bool ingCheck = false;
 
     //Instance to bring in Ingredients from Azure DB - RT
     public UserFridgeIngredient[] userFridgeIngredients { get; set; }
@@ -150,17 +136,18 @@
     //Grid to display ingridents in Sf grid in razor above - RT
     SfGrid<UserFridgeIngredient> grid;
 
-    //A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    //A list of the selected Rows (Index) of the Grid - RT
     public List<double> selectedRowIndexes { get; set; }
 
-    //A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    //A list of the selected Rows (Index) of the Grid - RT
     public double[] totalValue { get; set; }
 
-    ////A list of the selected Rows (Index) of the Grid - RT - *************PROBABLY DONT NEED
+    ////A list of the selected Rows (Index) of the Grid - RT
     public string selectedValue;
 
     //A List that is ONLY the ingredients the user checks off in the data grid - RT
     List<UserFridgeIngredient> IngredientsToSearchByList = new List<UserFridgeIngredient>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -231,19 +218,10 @@
                     Unit = t.Unit
                 });
             }
-            //Turning on switch to show seleted ingredients
-            ingCheck = true;
             //Rerendering to show seleted ingredients each time
             StateHasChanged();
         });
 
-        //selectedRowIndexes = await this.grid.GetSelectedRowIndexes();
-        //totalValue = selectedRowIndexes.ToArray();
-        //selectedValue = "";
-        //foreach (var data in totalValue)
-        //{
-        //    selectedValue = selectedValue + " " + data;
-        //}
         StateHasChanged();
     }
 
@@ -260,6 +238,7 @@
         //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
         {
+
             totalIngsSelected = 0;
             //Getting data from selected rows and putting them in a new List - RT
             List<UserFridgeIngredient> tempList = selectedData.Result;
@@ -283,21 +262,51 @@
                     Unit = t.Unit
                 });
             }
-            //Turning on switch to show seleted ingredients
-            ingCheck = true;
+
             //Rerendering to show seleted ingredients each time
             StateHasChanged();
         });
 
-        //selectedRowIndexes = await this.grid.GetSelectedRowIndexes();
-        //totalValue = selectedRowIndexes.ToArray();
-        //selectedValue = "";
-        //foreach (var data in totalValue)
-        //{
-        //    selectedValue = selectedValue + " " + data;
-        //}
         StateHasChanged();
     }
+
+    List<UserFridgeIngredient> testList = new List<UserFridgeIngredient>();
+
+    //Event handler before the item is deleted from the users fridge. This is where the item is removed from DB - RT
+    public async Task BatchDeleteEvent(BeforeBatchDeleteArgs<UserFridgeIngredient> args)
+    {
+        //Gets the Index of the selected rows in the Data grid- RT
+        var selectedRows = await grid.GetSelectedRowIndexes();
+
+        //Gets the data inside the row of selected rows in the Data grid - RT
+        var selectedData = this.grid.GetSelectedRecords();
+
+        //Waits for the 'selectedData' to be completed executing - RT
+        selectedData.GetAwaiter().OnCompleted(() =>
+        {
+            //Getting data from selected rows and putting them in a new List to be deleted - RT
+            List<UserFridgeIngredient> deleteIngredientsList = selectedData.Result;
+            foreach(var i in deleteIngredientsList)
+            {
+                testList.Add(i);
+            }
+
+        });
+
+        await Delete();
+        StateHasChanged();
+    }
+
+    public async Task Delete()
+    {
+        foreach (var i in testList)
+        {
+            var response = await client.DeleteAsync("api/userFridgeIng/" + i.Id.ToString());
+        }
+        testList.Clear();
+
+    }
+
 
     public async Task showRecipes()
     {
@@ -317,53 +326,10 @@
             }
             ingredientNum++;
         }
-        
+
         await sessionStorage.SetItemAsync<string>("ingredientList", ingredientAllc);
 
         navigationManager.NavigateTo("/recipefromprofile");
     }
-
-    //public async void ShowSelectedIngredients()
-    //{
-    //    //Gets the Index of the selected rows in the Data grid- RT
-    //    var selectedRows = await grid.GetSelectedRowIndexes();
-
-    //    //Gets the data inside the row of selected rows in the Data grid - RT
-    //    var selectedData =  this.grid.GetSelectedRecords();
-
-    //    //Waits for the 'selectedData' to be completed executing - RT
-    //    //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
-    //    //Completed first. This is why we use OnCompleted)
-    //    selectedData.GetAwaiter().OnCompleted(() =>
-    //    {
-    //        totalIngsSelected = 0;
-    //        //Getting data from selected rows and putting them in a new List - RT
-    //        List<UserFridgeIngredient> tempList =  selectedData.Result;
-
-    //        //Probably don't need, will test later - RT
-    //        StateHasChanged();
-
-    //        //This is to clear the list before the ingredients are added. Failsafe just in case the user
-    //        //removes items - RT
-    //        IngredientsToSearchByList.Clear();
-
-    //        //Addind the SELECTED ingredients to the list that will be used to serach for Recipes - RT
-    //        foreach (var t in tempList)
-    //        {
-    //            totalIngsSelected++;
-    //            IngredientsToSearchByList.Add(new UserFridgeIngredient
-    //            {
-    //                Name = t.Name,
-    //                Id = t.Id,
-    //                Quantity = t.Quantity,
-    //                Unit = t.Unit
-    //            });
-    //        }
-    //        //Turning on switch to show seleted ingredients
-    //        ingCheck = true;
-    //        //Rerendering to show seleted ingredients each time
-    //        StateHasChanged();
-    //    });
-    //}
 
 }

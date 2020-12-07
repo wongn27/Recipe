@@ -4,31 +4,17 @@ using System.Text;
 
 namespace Recipe.Web.Data.Models
 {
+    // https://api.spoonacular.com/recipes/complexSearch?addRecipeInformation=true&number=1&apiKey=d36cb53813e341069b3c81d6d3b61c31
 
-
-    public class RootobjectRecipe
+    public class RecipeComplexSearch
     {
-        public RecipeTest[] results { get; set; }
+        public RecipeResults[] results { get; set; }
         public int offset { get; set; }
         public int number { get; set; }
         public int totalResults { get; set; }
     }
 
-    public class RecipeTest
-    {
-        public int id { get; set; }
-        public string title { get; set; }
-        public string image { get; set; }
-        public string imageType { get; set; }
-    }
-
-
-    public class RootobjectRandom
-    {
-        public RecipeRandom[] recipes { get; set; }
-    }
-
-    public class RecipeRandom
+    public class RecipeResults
     {
         public bool vegetarian { get; set; }
         public bool vegan { get; set; }
@@ -48,7 +34,6 @@ namespace Recipe.Web.Data.Models
         public string license { get; set; }
         public string sourceName { get; set; }
         public float pricePerServing { get; set; }
-        public ExtendedingredientRandom[] extendedIngredients { get; set; }
         public int id { get; set; }
         public string title { get; set; }
         public int readyInMinutes { get; set; }
@@ -61,71 +46,32 @@ namespace Recipe.Web.Data.Models
         public string[] dishTypes { get; set; }
         public string[] diets { get; set; }
         public object[] occasions { get; set; }
-        public string instructions { get; set; }
-        public AnalyzedinstructionRandom[] analyzedInstructions { get; set; }
-        public object originalId { get; set; }
+        public Analyzedinstruction3[] analyzedInstructions { get; set; }
         public string spoonacularSourceUrl { get; set; }
     }
 
-    public class ExtendedingredientRandom
-    {
-        public int id { get; set; }
-        public string aisle { get; set; }
-        public string image { get; set; }
-        public string consistency { get; set; }
-        public string name { get; set; }
-        public string original { get; set; }
-        public string originalString { get; set; }
-        public string originalName { get; set; }
-        public float amount { get; set; }
-        public string unit { get; set; }
-        public string[] meta { get; set; }
-        public string[] metaInformation { get; set; }
-        public MeasuresRandom measures { get; set; }
-    }
-
-    public class MeasuresRandom
-    {
-        public UsRandom us { get; set; }
-        public MetricRandom metric { get; set; }
-    }
-
-    public class UsRandom
-    {
-        public float amount { get; set; }
-        public string unitShort { get; set; }
-        public string unitLong { get; set; }
-    }
-
-    public class MetricRandom
-    {
-        public float amount { get; set; }
-        public string unitShort { get; set; }
-        public string unitLong { get; set; }
-    }
-
-    public class AnalyzedinstructionRandom
+    public class Analyzedinstruction3
     {
         public string name { get; set; }
-        public StepRandom[] steps { get; set; }
+        public Step3[] steps { get; set; }
     }
 
-    public class StepRandom
+    public class Step3
     {
         public int number { get; set; }
         public string step { get; set; }
-        public IngredientRandom[] ingredients { get; set; }
-        public EquipmentRandom[] equipment { get; set; }
-        public LengthRandom length { get; set; }
+        public Ingredient3[] ingredients { get; set; }
+        public Equipment3[] equipment { get; set; }
+        public Length3 length { get; set; }
     }
 
-    public class LengthRandom
+    public class Length3
     {
         public int number { get; set; }
         public string unit { get; set; }
     }
 
-    public class IngredientRandom
+    public class Ingredient3
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -133,7 +79,7 @@ namespace Recipe.Web.Data.Models
         public string image { get; set; }
     }
 
-    public class EquipmentRandom
+    public class Equipment3
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -141,15 +87,5 @@ namespace Recipe.Web.Data.Models
         public string image { get; set; }
     }
 
-
-    public class FunFact
-    {
-        public string text { get; set; }
-    }
-
-
-
-
-
-
+    // }
 }
