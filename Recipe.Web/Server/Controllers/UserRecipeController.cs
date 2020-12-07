@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Recipe.Web.Data;
 using Recipe.Web.Data.Models;
 using System;
@@ -26,6 +27,14 @@ namespace Recipe.Web.Server.Controllers
             _context.Add(recipe);
             await _context.SaveChangesAsync();
             return Ok(recipe.Id);
+        }
+
+        //GET - Get all UserRecipePosts stored in the context based on user Guid - RT
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            var fridgeRecipe = await _context.Users_RecipePost.Where(a => a.UserId == id).ToListAsync();
+            return Ok(fridgeRecipe);
         }
     }
 }
