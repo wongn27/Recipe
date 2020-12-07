@@ -1,6 +1,7 @@
 @page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager navigationManager
 @inject HttpClient Http
 
 
@@ -23,6 +24,9 @@
     <input type="text"
            @bind="searchedItem" />
     <button type="button" @onclick="searchClick">Enter</button>
+    <br />
+    <br />
+    <button type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
     <br />
 
 
@@ -61,7 +65,6 @@
 
 
 }
-
 else
 {
     if (recipeSearchButtonPressed == true)
@@ -90,34 +93,36 @@ else
         </div>
     }
 }
+@if (funFact == null)
+{
 
+}
+else
+{
+    <br/>
+    <h2>Did you know: @funFact.text</h2>
+}
 
 @code {
 
     public string searchedItem { get; set; }
     RootobjectRecipe recipeTest;
+    RootobjectRandom randomRecipe;
     private string ApiStarter = "https://api.spoonacular.com/recipes/complexSearch?query=";
     private string ApiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
     private bool recipeSearchButtonPressed = false;
+    private bool reandomRecipeButtonPressed = false;
     public string Email { get; set; }
+    FunFact funFact;
     public System.Security.Principal.IPrincipal User { get; set; }
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
 
-    //List<Guid> list = new List<Guid>();
-    //User[] user { get; set; }
-
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    user = await Http.GetFromJsonAsync<User[]>("api/ingredientController");
-
-    //    var numbers2 = from u in ingredients
-    //                   where u.Name == "Taco"
-    //                   select u.Id;
-
-    //    list = numbers2.ToList();
-
-    //}
+    protected override async Task OnInitializedAsync()
+    {
+        funFact = await Http.GetFromJsonAsync<FunFact>
+            ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+    }
 
     private async Task searchClick()
     {
@@ -133,6 +138,17 @@ else
             recipeSearchButtonPressed = true;
 
         }
+    }
+
+    private async Task randomRecipeButton()
+    {
+        randomRecipe = await Http.GetFromJsonAsync<RootobjectRandom>
+            ("https://api.spoonacular.com/recipes/random?number=1" + ApiKey);
+
+        int recipeID = randomRecipe.recipes[0].id;
+        string recipeTitle = randomRecipe.recipes[0].title;
+        navigationManager.NavigateTo("/recipepage/" + recipeID.ToString() + "/" + recipeTitle);
+
     }
 }
 
