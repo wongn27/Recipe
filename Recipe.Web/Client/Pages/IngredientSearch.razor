@@ -9,6 +9,11 @@
     <label>Ingredient: </label>
     <input type="text" @bind="searchedIngredient" />
 </div>
+
+@*<button type="button" @onclick="searchClick">Search</button>   old button*@
+@*<input type="submit" class="form-control col-1 btn btn-primary" @onclick="searchClick" value="Search" />*@
+
+
 <button type="button" @onclick="searchClick">Search</button>
 @if (currentUser == null)
 {
@@ -18,6 +23,7 @@ else
 {
     <p>Welcome, @currentUser.FirstName</p>
 }
+
 @if (ingredients == null)
 {
     <SfCalendar TValue="DateTime"></SfCalendar>

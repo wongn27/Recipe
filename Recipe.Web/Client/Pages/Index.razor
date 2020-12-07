@@ -18,6 +18,7 @@
         {
         <p>Welcome, @FirstName</p>
         }
+
     </Authorized>
     <NotAuthorized>
         <p>Please login or register an account!</p>
@@ -30,12 +31,16 @@
     <br />
     <input type="text"
            @bind="searchedItem" />
-    <button type="button" @onclick="searchClick">Enter</button>
-    <br />
+
+ 
+    <button type="button" @onclick="searchClick">Search for Recipe</button>
+
     <br />
     <button type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
     <br />
 
+
+    <br />
 
 
     <input type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable">
