@@ -3,42 +3,59 @@
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-<h3>RecipesFromProfile</h3>
+<h3>Your Recipe Results</h3>
+@if (foundRecipes == null)
+{
+    <p>LOADING . .  .</p>
+}
+else
+{
+<div class="card-deck">
 
-
-@*<div class="card-deck">
         @foreach (var recipe in foundRecipes)
         {
-            <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
-                <div class="card-header">
-                    <h3>@recipe.title</h3>
-                </div>
-                <img class="card-img-top" src="@recipe.image" />
-                <p style="color:red">Missing Ingredients: @recipe.missedIngredients.Length</p>
+    <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+        <div class="card-header">
+            <h3>@recipe.title</h3>
+        </div>
+        <img class="card-img-top" src="@recipe.image" />
+        <l style="color:red">Missing Ingredients: @recipe.missedIngredients.Length  <a style="color:mediumseagreen"> Used Ingredients: @recipe.usedIngredientCount</a></l>
 
-                @for (int i = 0; i < recipe.missedIngredientCount; i++)
-                {
-                    <p style="color:red"> @recipe.missedIngredients[i].name</p>
-                }
-
-                <div class="card-footer text-center">
-                    <a href="#" class="btn btn-primary m-1">View Recipe</a>
-                    <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
-                    @if (displaySummarizationButtonPressed == true)
-                    {
-                        <p> @summarizeRecipe.summary.ToString()</p>
-                    }
-                    <a href="#" class="btn btn-primary m-1">View Missing Ingredients</a>
-                </div>
-            </div>
+        @for (int i = 0; i < recipe.missedIngredientCount; i++)
+        {
+            <l style="color:red"> @recipe.missedIngredients[i].name</l>
         }
-    </div>*@
+        @for (int k = 0; k < recipe.usedIngredientCount; k++)
+        {
+                                                                            <l style="color:mediumseagreen"> @recipe.usedIngredients[k].name</l>
+        }
+        <div class="card-footer text-center">
+            <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
+            <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
+            @*@if (displaySummarizationButtonPressed == true)
+            {
+                <p> @summarizeRecipe.summary.ToString()</p>
+            }*@
+            <a href="#" class="btn btn-primary m-1">View Missing Ingredients</a>
+        </div>
+    </div>
+        }
+    </div>
+}
 
 @code {
 
     public string userIngredientToSearchBy { get; set; }
     public string currentUserEmail { get; set; }
     User currentUser { get; set; }
+    //Starting URL for the Recipe Search - RT
+    string apiRecipeSearchStart = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
+    //Number of recipes returned
+    string numOfRecipesSearchedFor = "&number=5";
+    //The starting URL for the images - RT
+    string imageSourceRecipe = "https://spoonacular.com/recipeImages/";
+
+    RecipeModel[] foundRecipes;
 
 
     protected override async Task OnInitializedAsync()
@@ -52,12 +69,20 @@
         //Getting ingredients user searched for -RT
         userIngredientToSearchBy = await sessionStorage.GetItemAsync<string>("ingredientList");
 
+        //Calling the API here, and storing the Recipes in a list - RT
+        foundRecipes = await Http.GetFromJsonAsync<RecipeModel[]>
+        (apiRecipeSearchStart + userIngredientToSearchBy + numOfRecipesSearchedFor + "&ranking=1" + "&ignorePantry=true" + "&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
+        //Correcting image source URL. ALSO, getting count of missing ingredients for upcoming array - RT
+        int missingIngCount = 0;
+        foreach (var recipe in foundRecipes)
+        {
+            //Correcting Img source - RT
+            recipe.image = imageSourceRecipe + recipe.id.ToString() + "-" + "240x150." + recipe.imageType.ToString();
 
-
-
-
-
+            //Getting missing ingredient count - RT
+            missingIngCount += recipe.missedIngredientCount;
+        }
 
 
     }

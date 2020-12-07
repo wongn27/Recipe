@@ -12,7 +12,7 @@
 <button type="button" @onclick="searchClick">Search</button>
 @if (currentUser == null)
 {
-    <p>Not Logged in</p>
+    <h2>Not Logged In</h2>
 }
 else
 {
@@ -58,9 +58,10 @@ else
                             </select>
                         </form>
                     </td>
-                    @*<td><input type="number" id="myNumber" @bind="seletedNumOfUnits" /></td>*@
+                    <td><input type="number" id="myNumber" @bind="seletedNumOfUnits" /></td>
 
                     <td><button type="button" @onclick="@(() => AddSelectedIngToFridge(i))">Add To List</button></td>
+
                 </tr>
             }
         </tbody>
@@ -102,9 +103,10 @@ else
         <GridSelectionSettings Type="SelectionType.Multiple"></GridSelectionSettings>
         <GridEvents TValue="UserFridgeIngredient"></GridEvents>
     </SfGrid>
-    <button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>
+    @*<button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>*@
+<button type="button" class="btn btn-success" @onclick="SaveToDatabaseButton"><i class="oi oi-cart"></i> Save Ingredients To My Fridge</button>
 
-    <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
+    <button type="button" @onclick=FindRecipesButton>Find Recipes With These Ingredients</button>
 
     if (recipeSearchButtonPressed == true)
     {
@@ -125,8 +127,7 @@ else
                     }
 
                     <div class="card-footer text-center">
-                        <a href="#" class="btn btn-primary m-1">View Recipe</a>
-                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
+                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
                         @if (displaySummarizationButtonPressed == true)
                         {
                             <p> @summarizeRecipe.summary.ToString()</p>
@@ -250,12 +251,12 @@ else
 
     //This bool statment does not populate the Recipe part of the page if the ingredients are null - RT
     bool recipeSearchButtonPressed = false;
-    //Number of Recipes returned - RT
+    ////Number of Recipes returned - RT
     int numOfRecipeResults = 1;
     //Starting URL for the Recipe Search - RT
     string apiRecipeSearchStart = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
-    //Number of recipes returned
-    int numOfRecipesReturned = 1;
+    ////Number of recipes returned
+    //int numOfRecipesReturned = 1;
     //The starting URL for the images - RT
     string imageSourceRecipe = "https://spoonacular.com/recipeImages/";
 
@@ -271,11 +272,11 @@ else
         int ingredientNum = 1;
 
         //Loop to create the correct recipe search string for the API - RT
-        foreach (var ingredient in saved)
+        foreach (var ingredient in userFridgeIngredients)
         {
-            ingredientAllc += ingredient.name;
+            ingredientAllc += ingredient.Name;
 
-            if (ingredientNum != saved.Count)
+            if (ingredientNum != userFridgeIngredients.Count)
             {
                 ingredientAllc += ",+";
             }
