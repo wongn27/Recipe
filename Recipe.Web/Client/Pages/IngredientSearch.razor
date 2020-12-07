@@ -106,7 +106,7 @@ else
     @*<button type="button" @onclick="SaveToDatabaseButton">Save Ingredients To My Fridge</button>*@
 <button type="button" class="btn btn-success" @onclick="SaveToDatabaseButton"><i class="oi oi-cart"></i> Save Ingredients To My Fridge</button>
 
-    <button type="button" @onclick=FindRecipesButton>Find Recipes</button>
+    <button type="button" @onclick=FindRecipesButton>Find Recipes With These Ingredients</button>
 
     if (recipeSearchButtonPressed == true)
     {
@@ -127,8 +127,7 @@ else
                     }
 
                     <div class="card-footer text-center">
-                        <a href="#" class="btn btn-primary m-1">View Recipe</a>
-                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
+                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
                         @if (displaySummarizationButtonPressed == true)
                         {
                             <p> @summarizeRecipe.summary.ToString()</p>
@@ -273,11 +272,11 @@ else
         int ingredientNum = 1;
 
         //Loop to create the correct recipe search string for the API - RT
-        foreach (var ingredient in saved)
+        foreach (var ingredient in userFridgeIngredients)
         {
-            ingredientAllc += ingredient.name;
+            ingredientAllc += ingredient.Name;
 
-            if (ingredientNum != saved.Count)
+            if (ingredientNum != userFridgeIngredients.Count)
             {
                 ingredientAllc += ",+";
             }
