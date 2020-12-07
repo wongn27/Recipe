@@ -3,14 +3,21 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager navigationManager
 @inject HttpClient Http
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 
 <h1>In The Fridge</h1>
 
 <AuthorizeView>
     <Authorized>
-        <p>Welcome, @context.User.Identity.Name</p>
-        <p>Welcome, @Email</p>
+        @if (FirstName == null)
+        {
+
+        }
+        else
+        {
+        <p>Welcome, @FirstName</p>
+        }
     </Authorized>
     <NotAuthorized>
         <p>Please login or register an account!</p>
@@ -74,7 +81,7 @@
             <label for="Vegan"> Vegan</label>
         }*@
     <br />
-    <input type="checkbox" class="form-check-input" @onchange="CheckChanged"/>
+    <input type="checkbox" class="form-check-input" @onchange="CheckChanged" />
     <label for="Test"> Test</label>
     <p>@checkChanged</p>
 
@@ -113,30 +120,63 @@ else
 }
 else
 {
-    <br/>
+    <br />
     <h2>Did you know: @funFact.text</h2>
 }
 
 @code {
 
+    //Field entered in textbox - RT
     public string searchedItem { get; set; }
+    //Object that STORES the recipes from the search by user - RT
     RootobjectRecipe recipeTest;
+    //Stores the random recipe - RT
     RootobjectRandom randomRecipe;
+    //Starter for the recipe search
     private string ApiStarter = "https://api.spoonacular.com/recipes/complexSearch?query=";
+    //Our API Key - RT
     private string ApiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
+    //Trigger for recipe search button to display results - RT
     private bool recipeSearchButtonPressed = false;
-    private bool reandomRecipeButtonPressed = false;
-    public string Email { get; set; }
+    //Object for the fun fact - RT
     FunFact funFact;
     public System.Security.Principal.IPrincipal User { get; set; }
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    //User instance of current user logged in - RT
+    User currentUser { get; set; }
+    //Email of current logged in user - RT
+    public string currentUserEmail { get; set; }
+    public string FirstName { get; set; }
 
 
 
     protected override async Task OnInitializedAsync()
     {
+        //Getting fun fact on the homepage -RT
         funFact = await Http.GetFromJsonAsync<FunFact>
             ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+
+        //Getting current email of user logged in. This does the same as the code directly above.
+        //Keeping both for testing purposes - RT
+        //NOTE - Added sessionStorage to the Login.razor page under (LoginUser Button). That line is needed for this to work - RT
+        currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+
+        //Using userController and passing in the email of current user to get all the credentials of the user - RT
+        //This is where we also get the GUID of the logged in user - RT
+        //Also where we get the First Name for the top of the page - RT
+        //Had to put this in a try-catch since it is the starting point of the app. SessionStorage wont
+        //have a reference until the user logs in- RT
+        try
+        {
+            currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+            FirstName = currentUser.FirstName;
+        }
+        catch
+        {
+        }
+
+
+
     }
 
     RecipeResults[] recipeResults;
@@ -175,9 +215,9 @@ else
 
 
     //protected override async Task OnInitializedAsync()
-  //  {
-  //      recipeResults = await Http.GetFromJsonAsync<RecipeResults[]>(apiRecipeComplexSearchBaseUrl + apiAddRecipeInfoParam + returnSingleResult + apiKey);
-  //  }
+    //  {
+    //      recipeResults = await Http.GetFromJsonAsync<RecipeResults[]>(apiRecipeComplexSearchBaseUrl + apiAddRecipeInfoParam + returnSingleResult + apiKey);
+    //  }
 
     //private List<RecipeResults> LoadVeganRecipes(ChangeEventArgs e)
     ////protected List<RecipeResults> LoadVeganRecipes()
@@ -210,21 +250,20 @@ else
 
     //}
 
+    //Taking the string entered by the user and searching for recipes based on it -RT
     private async Task searchClick()
     {
-        //var u = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        //var u2 = u.User;
-        //var name = u2.Identity.Name;
 
         if (searchedItem != null)
         {
             recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>
-            (ApiStarter + searchedItem.ToString() + "&number=1" + ApiKey);
+            (ApiStarter + searchedItem.ToString() + "&number=10" + ApiKey);
             recipeSearchButtonPressed = true;
 
         }
     }
 
+    //Gets the random recipe and transfers it to the RecipePage - RT
     private async Task randomRecipeButton()
     {
         randomRecipe = await Http.GetFromJsonAsync<RootobjectRandom>
