@@ -1,6 +1,7 @@
 @page "/recipepage/{id:int}/{title}"
 @page "/recipepage"
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
 @using Recipe.Web.Data.Models
 
 
@@ -16,7 +17,8 @@ else
     <h3>@title</h3> <p>Date Added: TBD</p>
     <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
     <img src="@recipeDetails[0].image" />
-    <p>@recipeDetails[0].summary</p>
+    <p>@((MarkupString)recipeDetails[0].summary)</p>
+
 
     for (int i = 0; i < recipeDetails[0].extendedIngredients.Length; i++)
     {
@@ -55,8 +57,8 @@ else
                 <div style="display: table-cell">
                     <ol class="steps" float:right>
                         @*<li>Step 1: Do this</li>
-                        <li>Step 2: Do that</li>
-                        <li>Step 3: Do more stuff</li>*@
+                            <li>Step 2: Do that</li>
+                            <li>Step 3: Do more stuff</li>*@
                     </ol>
                 </div>
             </div>
@@ -76,14 +78,22 @@ else
 <textarea></textarea> <br />
         <button @onclick="reviewClick">Post Review</button>
         <br /> <br />
-        <button type="button" @onclick="printClick">Print</button>
-        <button type="button" @onclick="shareClick">Share</button>
-        <button type="button" @onclick="saveClick">Save</button>
+        <input type="button" value="Print/Save Recipe" onClick="window.print()">
     </div>
+    <a href="@fblink" target="_blank">
+        <img src="https://simplesharebuttons.com/images/somacro/facebook.png" alt="Facebook" />
+    </a>
+    <a href="@twlink" target="_blank">
+        <img src="https://simplesharebuttons.com/images/somacro/twitter.png" alt="Twitter" />
+    </a>
+    <a href="@rdlink" target="_blank">
+        <img src="https://simplesharebuttons.com/images/somacro/reddit.png" alt="Reddit" />
+    </a>
     <p>Button Test: @testButtons</p>
 }
 
 @code {
+    private string fblink, twlink, rdlink, currentUrl;
     //Need these two params to run through the page switch task. See @page statment top of page - RT
     [Parameter]
     public int id { get; set; }  //Recipe ID
@@ -125,7 +135,10 @@ else
         //recipe.image = imageSourceRecipe + id.ToString() + "-" + "480x360." + recipe.imageType.ToString();
 
         recipeDetails = await Http.GetFromJsonAsync<RecipeDetails[]>(apiRecipeInformationBulkBaseUrl + id + apiKey);
-
+        currentUrl = NavigationManager.Uri;
+        fblink = "http://www.facebook.com/sharer.php?u=" + currentUrl;
+        twlink = "https://twitter.com/share?url=" + currentUrl;
+        rdlink = "http://reddit.com/submit?url=" + currentUrl;
     }
 
 

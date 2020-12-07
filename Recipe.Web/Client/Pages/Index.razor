@@ -55,14 +55,28 @@
     <label for="Gluten Free"> Gluten Free</label>
 
     <br />
-    <input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
-    <label for="Vegan"> Vegan</label>
-    <br />
+    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
+        <label for="Vegan"> Vegan</label>
+        <br />*@
 
     <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
     <label for="Vegetarian"> Vegetarian</label>
     <br />
 
+    // @if (isSelected)
+    //{
+    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="LoadVeganRecipes" bind="@isSelected" checked @onclick="LoadVeganRecipes"/>
+        <label for="Vegan"> Vegan</label>*@
+    //}
+    @*else
+        {
+            <input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="@(async (e) => await ToggleSelectedAsync(false))" />
+            <label for="Vegan"> Vegan</label>
+        }*@
+    <br />
+    <input type="checkbox" class="form-check-input" @onchange="CheckChanged"/>
+    <label for="Test"> Test</label>
+    <p>@checkChanged</p>
 
 }
 else
@@ -118,15 +132,86 @@ else
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
 
+
     protected override async Task OnInitializedAsync()
     {
         funFact = await Http.GetFromJsonAsync<FunFact>
             ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
     }
 
+    RecipeResults[] recipeResults;
+    public string apiRecipeComplexSearchBaseUrl = "https://api.spoonacular.com/recipes/complexSearch";
+    public string apiAddRecipeInfoParam = "?addRecipeInformation=true";
+    public string returnSingleResult = "&number=1";
+    public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
+
+    //public bool isSelected = true;
+
+    private string checkChanged = "I am not checked";
+    [Parameter]
+    public bool isChecked { get; set; } = true;
+
+    private void CheckChanged()
+    //private List<RecipeResults> CheckChanged()
+    {
+        //List<RecipeResults> veganRecipes = new List<RecipeResults>();
+
+        if (!isChecked)
+        {
+            checkChanged = "Unchecked now!!";
+            isChecked = !isChecked;
+        }
+        else
+        {
+            checkChanged = "You have checked me now!!";
+            isChecked = !isChecked;
+
+            //veganRecipes = recipeResults.Where(x => x.vegan == true).ToList();
+
+        }
+
+        //return veganRecipes;
+    }
+
+
+    //protected override async Task OnInitializedAsync()
+  //  {
+  //      recipeResults = await Http.GetFromJsonAsync<RecipeResults[]>(apiRecipeComplexSearchBaseUrl + apiAddRecipeInfoParam + returnSingleResult + apiKey);
+  //  }
+
+    //private List<RecipeResults> LoadVeganRecipes(ChangeEventArgs e)
+    ////protected List<RecipeResults> LoadVeganRecipes()
+    //{
+    //    //if (isSelected)
+    //    //{
+    //    //var veganRecipes = recipeResults.Where<RecipeResults>(Func<RecipeResults, bool> )
+    //    //IEnumerable<RecipeResults> veganRecipes = from recipe in recipeResults
+    //    //                                          where recipe.vegan is true
+    //    //                                          select recipe;
+
+    //    List<RecipeResults> veganRecipes = recipeResults.Where(x => x.vegan).ToList();
+    //    return veganRecipes;
+    //    //}
+    //}
+
+
+    //List<Guid> list = new List<Guid>();
+    //User[] user { get; set; }
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    user = await Http.GetFromJsonAsync<User[]>("api/ingredientController");
+
+    //    var numbers2 = from u in ingredients
+    //                   where u.Name == "Taco"
+    //                   select u.Id;
+
+    //    list = numbers2.ToList();
+
+    //}
+
     private async Task searchClick()
     {
-
         //var u = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         //var u2 = u.User;
         //var name = u2.Identity.Name;

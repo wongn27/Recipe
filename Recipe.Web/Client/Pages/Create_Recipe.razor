@@ -1,0 +1,165 @@
+﻿@page "/create_recipe"
+@using Recipe.Web.Data.Models
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+
+<h3>Create Recipe</h3>
+
+<EditForm Model="@recipe" OnValidSubmit="@uploadRecipe">
+    <label>Recipe Name</label>
+    <InputText class="form-control col-3" @bind-Value="recipe.Name" />
+    <br />
+
+    <label>Add Picture URL</label>
+    <InputText class="form-control col-3" @bind-Value="recipe.PictureUrl" />
+    <br />
+    <p></p>
+    <br />
+    <label>Cooking Time</label>
+    <InputText class="form-control col-3" @bind-Value="recipe.CookingTime" />
+    <br />
+
+    <label>Calories</label>
+    <InputNumber class="form-control col-3" @bind-Value="recipe.CalorieCount" />
+    <br />
+
+    <label>Servings</label>
+    <InputNumber class="form-control col-3" @bind-Value="recipe.Servings" />
+    <br />
+
+    <label>Description</label>
+    <InputTextArea class="form-control col-3" @bind-Value="recipe.Description" />
+    <br />
+
+    <label>Ingredients</label>
+    <input type="text" @bind="i" />
+    <button type="button" @onclick="(() => addIngredient())">Add Ingredient</button>
+    <p>
+        @foreach (string x in ingredients)
+        {@x <br />}
+    </p>
+
+    <br />
+
+    <label>Steps</label>
+    <br />
+    <input type="text" @bind="s" />
+    <button type="button" @onclick="(() => addStep())">Add Step</button>
+    <p>
+        @foreach (string x in steps)
+        {@x <br />}
+    </p>
+
+    <br />
+
+    <!--<label>Cuisines</label>
+    <br />-->
+    <label>Additional Options</label>
+    <br />
+    <label>Vegan </label>
+    <InputCheckbox @bind-Value="recipe.IsVegan"></InputCheckbox>
+
+
+    <label>Vegetarian </label>
+    <InputCheckbox @bind-Value="recipe.IsVegetarian"></InputCheckbox>
+
+
+    <label>Gluten-Free </label>
+    <InputCheckbox @bind-Value="recipe.IsGlutenFree"></InputCheckbox>
+
+
+    <label>Dairy-Free </label>
+    <InputCheckbox @bind-Value="recipe.IsDairyFree"></InputCheckbox>
+
+
+    <label>Healthy </label>
+    <InputCheckbox @bind-Value="recipe.IsHealthy"></InputCheckbox>
+
+
+    <br />
+    <br />
+    <input type="submit" class="form-control col-1 btn btn-primary" value="Create Recipe" />
+
+</EditForm>
+
+@code {
+
+    private UserRecipePost recipe;
+
+    List<string> ingredients = new List<string>();
+    private List<string> steps = new List<string>();
+    private List<string> cuisines = new List<string>();
+    private string i = "";
+    private string s = "";
+    private string c = "";
+    private string iList = "", sList = "", cList = "";
+    private string currentUserEmail = "";
+    private User u;
+
+    //create a user Recipe Post object when the page is opened and store the user ID in it- AL
+    protected override async Task OnInitializedAsync()
+    {
+        recipe = new UserRecipePost();
+        recipe.Id = Guid.NewGuid();
+        recipe.DateCreated = DateTime.Now;
+        //get the logged in user's information- AL
+        currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+        u = await httpClient.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+        recipe.UserId = u.Id;
+    }
+
+    //Add Ingredient to the recipe
+    private void addIngredient()
+    {
+        ingredients.Add(i);
+        iList = iList + i + ";";
+        recipe.Ingredients = iList;
+    }
+
+    //TBA: remove ingredients from the object- AL
+    private void removeIngredient()
+    {
+
+    }
+
+    private void addPicture()
+    {
+
+
+    }
+
+    //Add a step to the recipe- AL
+    private void addStep()
+    {
+        steps.Add(s);
+        sList = sList + s + ";";
+        recipe.Steps = sList;
+    }
+
+    /*private void addCuisine()
+    {
+        cuisines.Add(c);
+        cList = cList + c + ";";
+        recipe.Cuisines = cList;
+    }*/
+
+    //upload the user recipe post to the database- AL
+    private async Task uploadRecipe()
+    {
+
+        var response = await httpClient.PostAsJsonAsync("api/userRecipeController", recipe);
+        if (response.IsSuccessStatusCode)
+        {
+            navigationManager.NavigateTo("/Search");
+        }
+        else
+        {
+            navigationManager.NavigateTo("/error");
+        }
+
+    }
+
+}
