@@ -1,4 +1,4 @@
-﻿@page "/profile"
+@page "/profile"
 @using Recipe.Web.Data
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
@@ -10,6 +10,23 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager navigationManager
+
+
+<br />
+<label>About Me</label>
+<br />
+<p id="Description">@desc</p>
+<br />
+
+<label>Email</label>
+<br />
+@*<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
+    <label>Password</label> <button @onclick="changePassClick">Change Password</button><br />*@
+
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changeUserClick" value="Change Username" />
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changePassClick" value="Change Password" />
+<br />
+
 
 @if (userFridgeIngredientsDataGridList == null)
 {
@@ -92,6 +109,10 @@
 </AuthorizeView>
 
 
+<input type="submit" class="form-control col-2 btn btn-primary" @onclick="editProfileClick" value="Edit Profile" />
+
+<p>@buttonCheck</p>
+
 @code {
 
         //Toolbar for Datagrid - RT
@@ -166,6 +187,13 @@
         //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
         {
+
+
+            Name = "Taco",
+            InTheFridgeIngredientId = 3424,
+            Quantity = 3,
+            Unit = "Unit"
+
             totalIngsSelected = 0;
             //Getting data from selected rows and putting them in a new List - RT
             List<UserFridgeIngredient> tempList = selectedData.Result;
@@ -176,6 +204,7 @@
             //This is to clear the list before the ingredients are added. Failsafe just in case the user
             //removes items - RT
             IngredientsToSearchByList.Clear();
+
 
             //Addind the SELECTED ingredients to the list that will be used to serach for Recipes - RT
             foreach (var t in tempList)
