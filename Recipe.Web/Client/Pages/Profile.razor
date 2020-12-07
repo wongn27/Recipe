@@ -12,21 +12,6 @@
 @inject NavigationManager navigationManager
 
 
-<br />
-<label>About Me</label>
-<br />
-<p id="Description">@desc</p>
-<br />
-
-<label>Email</label>
-<br />
-@*<label>Username</label> <button @onclick="changeUserClick">Change Username</button><br />
-    <label>Password</label> <button @onclick="changePassClick">Change Password</button><br />*@
-
-<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changeUserClick" value="Change Username" />
-<input type="submit" class="form-control col-2 btn btn-primary" @onclick="changePassClick" value="Change Password" />
-<br />
-
 
 @if (userFridgeIngredientsDataGridList == null)
 {
@@ -121,9 +106,6 @@
 </AuthorizeView>
 
 
-<input type="submit" class="form-control col-2 btn btn-primary" @onclick="editProfileClick" value="Edit Profile" />
-
-<p>@buttonCheck</p>
 
 @code {
 
@@ -206,12 +188,6 @@
         //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
         {
-
-
-            Name = "Taco",
-            InTheFridgeIngredientId = 3424,
-            Quantity = 3,
-            Unit = "Unit"
 
             totalIngsSelected = 0;
             //Getting data from selected rows and putting them in a new List - RT
