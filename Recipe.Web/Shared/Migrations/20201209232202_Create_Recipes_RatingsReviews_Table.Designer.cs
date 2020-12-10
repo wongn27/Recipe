@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Recipe.Web.Data;
 
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    partial class RecipeContextModelSnapshot : ModelSnapshot
+    [Migration("20201209232202_Create_Recipes_RatingsReviews_Table")]
+    partial class Create_Recipes_RatingsReviews_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,8 +131,8 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
+                    b.Property<string>("Rating")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
@@ -142,10 +144,6 @@ namespace Recipe.Web.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RecipeId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Recipes_RatingsReviews");
                 });
@@ -317,25 +315,6 @@ namespace Recipe.Web.Data.Migrations
                     b.HasIndex("IngredientId");
 
                     b.ToTable("Users_ShoppingList");
-                });
-
-            modelBuilder.Entity("Recipe.Web.Data.Models.RecipeRatingReview", b =>
-                {
-                    b.HasOne("Recipe.Web.Data.Models.InTheFridgeRecipe", "InTheFridgeRecipeId")
-                        .WithMany()
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Recipe.Web.Data.Models.User", "IdOfUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IdOfUser");
-
-                    b.Navigation("InTheFridgeRecipeId");
                 });
 
             modelBuilder.Entity("Recipe.Web.Data.Models.UserShoppingList", b =>
