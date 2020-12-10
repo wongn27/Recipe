@@ -2,6 +2,8 @@
 @using Recipe.Web.Data.Models
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager navigationManager
+
 
 <h3>Your Recipe Results</h3>
 @if (foundRecipes == null)
@@ -10,35 +12,33 @@
 }
 else
 {
-<div class="card-deck">
+    <div class="card-deck">
 
         @foreach (var recipe in foundRecipes)
         {
-    <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
-        <div class="card-header">
-            <h3>@recipe.title</h3>
-        </div>
-        <img class="card-img-top" src="@recipe.image" />
-        <l style="color:red">Missing Ingredients: @recipe.missedIngredients.Length  <a style="color:mediumseagreen"> Used Ingredients: @recipe.usedIngredientCount</a></l>
+            <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                <div class="card-header">
+                    <h3>@recipe.title</h3>
+                </div>
+                <img class="card-img-top" src="@recipe.image" />
+                <l style="color:red">Missing Ingredients: @recipe.missedIngredients.Length  <a style="color:mediumseagreen"> Used Ingredients: @recipe.usedIngredientCount</a></l>
 
-        @for (int i = 0; i < recipe.missedIngredientCount; i++)
-        {
-            <l style="color:red"> @recipe.missedIngredients[i].name</l>
-        }
-        @for (int k = 0; k < recipe.usedIngredientCount; k++)
-        {
-                                                                            <l style="color:mediumseagreen"> @recipe.usedIngredients[k].name</l>
-        }
-        <div class="card-footer text-center">
-            <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
-            <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">Quick Description</a>
-            @*@if (displaySummarizationButtonPressed == true)
-            {
-                <p> @summarizeRecipe.summary.ToString()</p>
-            }*@
-            <a href="#" class="btn btn-primary m-1">View Missing Ingredients</a>
-        </div>
-    </div>
+                @for (int i = 0; i < recipe.missedIngredientCount; i++)
+                {
+                    <l style="color:red"> @recipe.missedIngredients[i].name</l>
+                }
+                @for (int k = 0; k < recipe.usedIngredientCount; k++)
+                {
+                    <l style="color:mediumseagreen"> @recipe.usedIngredients[k].name</l>
+                }
+                <div class="card-footer text-center">
+                    <button type="button" @onclick="@(() => selectedRecipeToView(recipe))" class="btn btn-primary m-1">View Recipe</button>
+                    @*@if (displaySummarizationButtonPressed == true)
+                        {
+                            <p> @summarizeRecipe.summary.ToString()</p>
+                        }*@
+                </div>
+            </div>
         }
     </div>
 }
@@ -83,9 +83,31 @@ else
             //Getting missing ingredient count - RT
             missingIngCount += recipe.missedIngredientCount;
         }
-
-
     }
 
+    //Passing the selceted recipe to the recipe page.
+    //Also sending the missing ingredients across pages -RT
+    public async Task selectedRecipeToView(RecipeModel recipe)
+    {
+        int recipeId = recipe.id;
+        string recipeName = recipe.title;
+        string missingIngs = "";
+        int ingredientCount = 0;
 
+        //Saving missing ingredients to long string - RT
+        foreach (var ings in recipe.missedIngredients)
+        {
+            missingIngs += (ings.name);
+            ingredientCount++;
+            if (ingredientCount != recipe.missedIngredientCount)
+            {
+                missingIngs += ",";
+            }
+        }
+
+        //Saving long string to sessionStorage and pulling on recipe page - RT
+        await sessionStorage.SetItemAsync<string>("missingIngredientString", missingIngs);
+        navigationManager.NavigateTo("/recipepage/" + recipeId.ToString() + "/" + recipeName);
+
+    }
 }

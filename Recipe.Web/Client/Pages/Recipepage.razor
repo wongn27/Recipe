@@ -3,28 +3,41 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @using Recipe.Web.Data.Models
-
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 @if (recipeDetails == null)
 {
     <!--Pancake flip loading screen for a little *RAZZLE DAZZLE* NOTE: Need this "if null" check or info won't render async task- RT -->
     <img src="/images/Making-pancake-loader.gif" width="300" height="300" />
-
 }
-
 else
 {
     <h3>@title</h3> <p>Date Added: TBD</p>
+
+
     <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
     <img src="@recipeDetails[0].image" />
-    <p>@((MarkupString)recipeDetails[0].summary)</p>
 
+    @if (missingIngredientList != null)
+    {
+        <p><strong><em><span style="color: #ff0000;">Missing Ingredients</span></em></strong></p>
+
+        @foreach (var ing in missingIngredientList)
+        {
+            <ul>
+                <li><span style="color: #ff0000;"><strong><em>@ing</em></strong></span></li>
+            </ul>
+        }
+        <button type="button" class="btn btn-success" @onclick="addToShoppingListButton"><i class="oi oi-cart"></i>Add Missing to Shopping List</button>
+
+    }
+    <br />
+    <p>@((MarkupString)recipeDetails[0].summary)</p>
 
     for (int i = 0; i < recipeDetails[0].extendedIngredients.Length; i++)
     {
         <li>@recipeDetails[0].extendedIngredients[i].originalString</li>
     }
-
     <br />
 
     for (int i = 0; i < recipeDetails[0].analyzedInstructions.Length; i++)
@@ -110,6 +123,14 @@ else
     //Instance of RecipeModel to store recipe info (Not cooking instructions). See "RecipeModel.cs" for variables - RT
     RecipeModel recipe;// = new RecipeModel();
 
+    //String to get missing Ingredients form RecipesFromProfile page
+    string missingIngredients { get; set; }
+
+    List<string> missingIngredientList = new List<string>();
+
+    public string currentUserEmail { get; set; }
+
+    public User currentUser { get; set; }
 
     RecipeDetails[] recipeDetails;
     public string apiRecipeInformationBulkBaseUrl = "https://api.spoonacular.com/recipes/informationBulk?ids=";
@@ -134,12 +155,49 @@ else
         //Correcting image link so it can be pulled from the correct database off API link - RT
         //recipe.image = imageSourceRecipe + id.ToString() + "-" + "480x360." + recipe.imageType.ToString();
 
+        //Getting email of current User - RT
+        currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+
+        //Getting Current user instance. This is where Guid is also gained - RT
+        currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+
+        missingIngredients = await sessionStorage.GetItemAsync<string>("missingIngredientString");
+
+        stringCleaner(missingIngredients);
+
         recipeDetails = await Http.GetFromJsonAsync<RecipeDetails[]>(apiRecipeInformationBulkBaseUrl + id + apiKey);
         currentUrl = NavigationManager.Uri;
         fblink = "http://www.facebook.com/sharer.php?u=" + currentUrl;
         twlink = "https://twitter.com/share?url=" + currentUrl;
         rdlink = "http://reddit.com/submit?url=" + currentUrl;
     }
+
+
+    public void stringCleaner(string uncleanString)
+    {
+        string totalWord = "";
+        foreach (char c in uncleanString)
+        {
+            if (c != ',')
+            {
+                totalWord += c;
+            }
+            else
+            {
+                missingIngredientList.Add(totalWord);
+                totalWord = "";
+            }
+        }
+    }
+
+    public async Task addToShoppingListButton()
+    {
+        foreach (var ing in missingIngredientList)
+        {
+            var response = await Http.PostAsJsonAsync("api/userShoppingListController", ing);
+        }
+    }
+
 
 
 

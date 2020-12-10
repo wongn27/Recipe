@@ -3,7 +3,7 @@
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Syncfusion.Blazor
-
+@using Syncfusion.Blazor.Lists
 @using System.Security.Claims
 @inject HttpClient client
 @inject IJSRuntime js
@@ -34,21 +34,40 @@
             </font>
             <br />
             <img src="/android-chrome-512x512.png" width="300" height="300" />
-           
+
             @if (userRecipePosts != null)
-            { 
-            <font size="5" face="arial" color="purple">
-                <p><strong>Your Created Recipes</strong></p>
-                @for(int i = 0; i <  userRecipePosts.Length; i++)
-                {
-                    int number = i + 1;
-                   <ol>@number . @userRecipePosts[i].Name    </ol>
-                }
-            </font>
+            {
+                <font size="5" face="arial" color="purple">
+                    <p><strong>Your Created Recipes</strong></p>
+                    @for (int i = 0; i < userRecipePosts.Length; i++)
+                    {
+                        int number = i + 1;
+                        <ol>@number . @userRecipePosts[i].Name    </ol>
+                    }
+                </font>
             }
         }
+
+        <!--Nested list for the user created Recipes - RT-->
+        <div class="control-section">
+            <SfListView CssClass="nestedlist" DataSource="@userRecipePostDataModel" ShowHeader="true" HeaderTitle="Created Recipes" ShowIcon="true">
+                <ListViewFieldSettings TValue="UserRecipePostDataModel" Id="Id" Text="name" Child="Child" Tooltip="Text"></ListViewFieldSettings>
+                <ListViewEvents TValue="UserRecipePostDataModel" Clicked="@(e=> seletedNestedList.Add(Tuple.Create(e.Text, e.ItemData.Id)))"></ListViewEvents>
+            </SfListView>
+        </div>
+
+        <!--Used to run method below if user selects items from the NestedList. All this is is a trigger - RT-->
+        @if(seletedNestedList.Count > 0)
+        {
+            //This can always add the first index of seletedNestedList because seletedNestedList is cleared each time -RT
+            selectedRecipeChoiceFullClicks.Add(seletedNestedList[0]);
+            ViewRecipeNestedListClick(seletedNestedList);
+        }
+
         <br>
         <br />
+
+        <!--Datagrid for the users saved ingredients - RT-->
         <font size="5" face="arial" color="purple">
             <strong>Your Fridge</strong>
         </font>
@@ -109,6 +128,30 @@
 
 @code {
 
+    //Used to store when the user clicks the NestedList. This stores the strings
+    //i.e - first string seleced is the created Recipe (Ex: Chicken soup) and after,
+    //"View Recipe". If the newest item added is "View Recipe," a method in triggered
+    //to pull the recipe before the "View Recipe" item - RT
+    //Using a Tuple so the clicks are stored in pairs. - RT
+    List<Tuple<string, string>> seletedNestedList = new List<Tuple<string, string>>();
+
+    //Works with the selectedRecipe list. This list is not
+    //cleared after each click. The "selectedRecipe" is.
+    //See "ViewRecipeNestedListClick" for more details - RT
+    List<Tuple<string, string>> selectedRecipeChoiceFullClicks = new List<Tuple<string, string>>();
+
+    List<string> guidListRecipeChiceFromPost = new List<string>();
+    //This calss is needed to bind to the list data of the Created recipes - RT
+    class UserRecipePostDataModel
+    {
+        public string Id { get; set; }
+        public string name { get; set; }
+        public List<UserRecipePostDataModel> Child { get; set; }
+    }
+
+    //Instance of class above - RT
+    List<UserRecipePostDataModel> userRecipePostDataModel = new List<UserRecipePostDataModel>();
+
     //Toolbar for Datagrid - RT
     public string[] toolBarItems = new string[] { "Edit", "Delete", "Update" };
 
@@ -148,6 +191,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+
+        base.OnInitialized();
+
         //Getting current user email that is logged in using our AuthenticationState - RT
         var asyncUser = await ((CustomAuthenticationStateProvider)authenticationStateProvider).GetAuthenticationStateAsync();
         var currentUserTemp = asyncUser.User;
@@ -173,6 +219,17 @@
 
         //Gets UserRecipePosts if there are any and stores them in an object - RT
         userRecipePosts = await client.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController/" + currentUser.Id);
+
+        //Used to fill the NestedListView of user created Recipes - RT
+        foreach (var post in userRecipePosts)
+        {
+            userRecipePostDataModel.Add(new UserRecipePostDataModel
+            {
+                Id = post.Id.ToString(),
+                name = post.Name,
+                Child = new List<UserRecipePostDataModel>() { new UserRecipePostDataModel { Id = post.Id.ToString(), name = "View Recipe" } }
+            });
+        }
     }
 
     public async Task GetRowsDropped(RowDeselectEventArgs<UserFridgeIngredient> args)
@@ -281,7 +338,7 @@
         {
             //Getting data from selected rows and putting them in a new List to be deleted - RT
             List<UserFridgeIngredient> deleteIngredientsList = selectedData.Result;
-            foreach(var i in deleteIngredientsList)
+            foreach (var i in deleteIngredientsList)
             {
                 testList.Add(i);
             }
@@ -302,6 +359,26 @@
 
     }
 
+    //Runs every time an an item is clicked in the nested RecipePost list - RT
+    public void ViewRecipeNestedListClick(List<Tuple<string, string>> obj)
+    {
+        //If the lastest click was the "View Recipe" button - RT
+        if(obj[0].Item1 == "View Recipe")
+        {
+            //Getting the total number of clicks from the list storing all the click info - RT
+            int numberOfItems = selectedRecipeChoiceFullClicks.Count;
+            //Going back to the twice since the clicks are stored as a pair - RT
+            string lastRecipeClicked = selectedRecipeChoiceFullClicks[numberOfItems - 2].Item2;
+ 
+            navigationManager.NavigateTo("/recipefromprofile");
+        }
+        else
+        {
+            //Clearing list so we always have the most recent click in index zero - RT
+            seletedNestedList.Clear();
+        }
+
+    }
 
     public async Task showRecipes()
     {
@@ -328,3 +405,14 @@
     }
 
 }
+
+
+<style>
+    
+    .nestedlist {
+        max-width: 500px;
+        margin: auto;
+        border: 1px solid #dddddd;
+        border-radius: 3px;
+    }
+</style>
