@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Recipe.Web.Data;
 using Recipe.Web.Data.Models;
+using Recipe.Web.Data.Utilities;
 using Recipe.Web.Server.Services;
 
 namespace Recipe.Web.Server.Controllers
@@ -50,10 +51,10 @@ namespace Recipe.Web.Server.Controllers
 
         private async Task<SpoonacularRecipe[]> GetApiResponseFromSpoonacular(string searchString)
         {
-            var helper = new SpoonacularApiHelper();
-            helper.AddParameter(SpoonacularApiEndpoint.ComplexSearch, "query", searchString);
-            helper.AddParameter(SpoonacularApiEndpoint.ComplexSearch, "number", 10);
-            var spoonacularRecipes = await httpClient.GetFromJsonAsync<SpoonacularRecipe[]>(helper.BuildEndpoint(SpoonacularApiEndpoint.ComplexSearch));
+            var helper = new SpoonacularApiHelper(SpoonacularApiEndpoint.ComplexSearch);
+            helper.AddParameter("query", searchString);
+            helper.AddParameter("number", 10);
+            var spoonacularRecipes = await httpClient.GetFromJsonAsync<SpoonacularRecipe[]>(helper.BuildEndpoint());
 
             return spoonacularRecipes;
         }
