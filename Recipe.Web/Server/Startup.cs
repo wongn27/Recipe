@@ -42,9 +42,8 @@ namespace Recipe.Web.Server
             services.AddSyncfusionBlazor();
             //Allows the same instance of a class to be shared across components - RT
             services.AddSingleton<Data.Models.IngredientModel>();
+            services.AddDbContext<RecipeContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-           services.AddDbContext<RecipeContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-           
             services
                 .AddScoped<RecipeContext>()
                 .AddScoped<AccountService>()
@@ -52,7 +51,6 @@ namespace Recipe.Web.Server
                 .AddScoped<AuthenticateModel>()
                 .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>()
                 .AddScoped<ISessionStorageService, SessionStorageService>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
