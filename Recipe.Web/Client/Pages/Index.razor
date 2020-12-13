@@ -1,10 +1,11 @@
 @page "/"
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
+@using Recipe.Web.Data.Utilities
 @inject NavigationManager navigationManager
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
+@inject IJSRuntime JS
 
 <h1>In The Fridge</h1>
 
@@ -16,63 +17,74 @@
         }
         else
         {
-        <p>Welcome, @FirstName</p>
+            <p>Welcome, @FirstName</p>
         }
 
     </Authorized>
     <NotAuthorized>
-        <p>Please login or register an account!</p>
+        <p>Please <a href="/login">login</a> or register an account!</p>
     </NotAuthorized>
 </AuthorizeView>
 
 @if (recipeTest == null)
 {
+    <hr />
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <button title="Search for a recipe" class="btn btn-outline-info" type="button" @onclick="searchClick">Search for Recipe</button>
+        </div>
+        <input class="input-group-text" type="text" @bind="searchedItem" placeholder="Enter a recipe..." />
+    </div>
+
+    <div>
+        <button title="Find a random recipe" class="btn btn-outline-warning" type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
+    </div>
+
     <br />
-    <br />
-    <input type="text"
-           @bind="searchedItem" />
-
- 
-    <button type="button" @onclick="searchClick">Search for Recipe</button>
-
-    <br />
-    <button type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
-    <br />
 
 
-    <br />
+    <!--Filters-->
+    <!-- These filters are not avaialble as parameters for the endpoint, but available only in the response. -->
 
-
-    <input type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable">
+    <!--
+    <input title="Recipes built with sustainable ingredients?" type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable" @onchange="@SustainableCheckboxOnChange">
     <label for="Sustainable"> Sustainable</label>
     <br />
 
-    <input type="checkbox" id="Popular" name="Popular" value="Popular">
+    <input type="checkbox" id="Popular" name="Popular" value="Popular" @onchange="@PopularCheckboxOnChange">
     <label for="Popular"> Popular</label>
     <br />
 
-    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap">
+    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap" @onchange="@CheapCheckboxOnChange">
     <label for="Cheap"> Cheap</label>
     <br />
 
-    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy">
+    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy" @onchange="@HealthyCheckboxOnChange">
     <label for="Healthy"> Healthy</label>
     <br />
-
-    <input type="checkbox" id="Dairy Free" name="Dairy Free" value="Dairy Free">
-    <label for="Dairy Free"> Dairy Free</label>
+    -->
     <br />
+    <div>
+        <!--Intolerences -->
+        <label class="col-form-label-lg text-success">
+            Intolerences
+        </label>
 
-    <input type="checkbox" id="Gluten Free" name="Gluten Free" value="Gluten Free">
-    <label for="Gluten Free"> Gluten Free</label>
+        <br />
 
-    <br />
-    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan">
-        <label for="Vegan"> Vegan</label>
-        <br />*@
+        <input class="form-check-input" type="checkbox" id="Dairy Free" name="Dairy Free" value="Dairy Free" title="Recipes that contain dairy free ingredients." @onchange="@DairyFreeCheckboxOnChange">
+        <label for="Dairy Free"> Dairy Free</label>
 
-    <input type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian">
-    <label for="Vegetarian"> Vegetarian</label>
+        <br />
+
+        <input class="form-check-input" type="checkbox" id="Gluten Free" name="Gluten Free" value="Gluten Free" title="Recipes that contain gluten free ingredients." @onchange="@GlutenFreeCheckboxOnChange">
+        <label for="Gluten Free"> Gluten Free</label>
+
+        <br />
+
+        <input class="form-check-input" type="checkbox" id="Vegetarian" name="Vegetarian" value="Vegetarian" title="Recipes that are vegetarian friendly." @onchange="@VegetarianCheckboxOnChange">
+        <label for="Vegetarian"> Vegetarian</label>
+    </div>
     <br />
 
     // @if (isSelected)
@@ -108,6 +120,8 @@ else
                         <a href="#" class="btn btn-primary m-1">Quick Description</a>
                         <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
 
+
+
                         <!-- @if (displaySummarizationButtonPressed == true) -->
                         <!--//  { -->
                         <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
@@ -130,7 +144,7 @@ else
 }
 
 @code {
-
+    private const int numberOfApiResults = 1;
     //Field entered in textbox - RT
     public string searchedItem { get; set; }
     //Object that STORES the recipes from the search by user - RT
@@ -152,8 +166,6 @@ else
     //Email of current logged in user - RT
     public string currentUserEmail { get; set; }
     public string FirstName { get; set; }
-
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -179,8 +191,6 @@ else
         catch
         {
         }
-
-
 
     }
 
@@ -258,14 +268,87 @@ else
     //Taking the string entered by the user and searching for recipes based on it -RT
     private async Task searchClick()
     {
+        if (string.IsNullOrEmpty(searchedItem))
+        {
+            await JS.InvokeAsync<object>("alert", "Search query is not valid. Please enter a search string.");
+            return;
+        }
 
+        var helper = new SpoonacularApiHelper(SpoonacularApiEndpoint.ComplexSearch);
         if (searchedItem != null)
         {
-            recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>
-            (ApiStarter + searchedItem.ToString() + "&number=10" + ApiKey);
-            recipeSearchButtonPressed = true;
+            helper.AddParameter<string>("query", searchedItem);
+            helper.AddParameter<int>("number", numberOfApiResults);
 
+            var listOfIntolerances = new List<string>();
+            var listOfDiets = new List<string>();
+
+            if (IsDairyFree)
+                listOfIntolerances.Add("Dairy");
+
+            if (IsGlutenFree)
+                listOfIntolerances.Add("Gluten");
+
+            if (IsVegetarian)
+                listOfIntolerances.Add("Vegetarian");
+
+            if (listOfIntolerances.Any())
+                helper.AddParameters("intolerances", ",", listOfIntolerances.ToArray());
+
+            var requestUrl = helper.BuildEndpoint();
+
+            recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>(requestUrl);
+            recipeSearchButtonPressed = true;
         }
+    }
+
+    private bool IsPopular { get; set; } = false;
+
+    private void PopularCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsPopular = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsSustainable { get; set; } = false;
+
+    private void SustainableCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsSustainable = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsCheap { get; set; } = false;
+
+    private void CheapCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsCheap = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsHealthy { get; set; } = false;
+
+    private void HealthyCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsHealthy = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsDairyFree { get; set; } = false;
+
+    private void DairyFreeCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsDairyFree = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsGlutenFree { get; set; } = false;
+
+    private void GlutenFreeCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsGlutenFree = bool.Parse(args.Value.ToString());
+    }
+
+    private bool IsVegetarian { get; set; } = false;
+
+    private void VegetarianCheckboxOnChange(ChangeEventArgs args)
+    {
+        IsVegetarian = bool.Parse(args.Value.ToString());
     }
 
     //Gets the random recipe and transfers it to the RecipePage - RT
