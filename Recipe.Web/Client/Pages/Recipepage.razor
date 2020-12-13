@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @using Recipe.Web.Data.Models
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@using Syncfusion.Blazor.Popups
 
 @if (recipeDetails == null)
 {
@@ -18,19 +19,35 @@ else
     <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
     <img src="@recipeDetails[0].image" />
 
-    @if (missingIngredientList != null)
+    <!-- Only showing the missing ingredients if user is logged in and they used items from their fridge -RT-->
+    if (missingIngredientList.Count > 0)
     {
         <p><strong><em><span style="color: #ff0000;">Missing Ingredients</span></em></strong></p>
 
-        @foreach (var ing in missingIngredientList)
+        
+        @for (int i = 0; i < missingIngredientList.Count; i++)
         {
             <ul>
-                <li><span style="color: #ff0000;"><strong><em>@ing</em></strong></span></li>
+                <li><span style="color: #ff0000;"><strong><em>@missingIngredientList[i]: @missingIngredientAmountList[i] @missingIngredientUnit[i]</em></strong></span></li>
             </ul>
         }
         <button type="button" class="btn btn-success" @onclick="addToShoppingListButton"><i class="oi oi-cart"></i>Add Missing to Shopping List</button>
 
+        //Popup window after adding items to Shopping List - RT
+        <SfDialog Content="@Content" Header="@Header" Width="350px" Height="250px" Visible="false" @ref="DialogObj">
+            <DialogPositionData X="300" Y="200"></DialogPositionData>
+            <DialogButtons>
+                <DialogButton OnClick="@click">
+                    <DialogButtonModel Content="OK" IsPrimary="true"></DialogButtonModel>
+                </DialogButton>
+            </DialogButtons>
+        </SfDialog>
     }
+    else
+    {
+        
+    }
+    <br/>
     <br />
     <p>@((MarkupString)recipeDetails[0].summary)</p>
 
@@ -106,6 +123,7 @@ else
 }
 
 @code {
+
     private string fblink, twlink, rdlink, currentUrl;
     //Need these two params to run through the page switch task. See @page statment top of page - RT
     [Parameter]
@@ -124,56 +142,69 @@ else
     RecipeModel recipe;// = new RecipeModel();
 
     //String to get missing Ingredients form RecipesFromProfile page
-    string missingIngredients { get; set; }
+    string missingIngredientsString { get; set; }
+    string missingIngredientUnitsString { get; set; }
+    string missingIngredientAmountString { get; set; }
 
+    //List used to populate the razor and add to db context - RT
     List<string> missingIngredientList = new List<string>();
+    List<string> missingIngredientUnit = new List<string>();
+    List<string> missingIngredientAmountList = new List<string>();
 
+    //Current Users email - RT
     public string currentUserEmail { get; set; }
 
+    //Current logged in user - RT
     public User currentUser { get; set; }
+
+    //Used for popupBox- RT
+    SfDialog DialogObj;
+    public string Content = "Items Added To Shopping List";
+    public string Header = "Shopping List";
 
     RecipeDetails[] recipeDetails;
     public string apiRecipeInformationBulkBaseUrl = "https://api.spoonacular.com/recipes/informationBulk?ids=";
     public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
 
 
-
-
     //Async task to gather info before page is rendered. NOTE: If there is no "@if (recipe == null)" at the top, not all the information
     //will be gathered - RT
     protected override async Task OnInitializedAsync()
     {
-
-        //Storing cooking instructions - RT
-        //cookingInstructions = await Http.GetFromJsonAsync<CookingInstructions[]>(apiRecipeInstructionsLinkStart +
-        //id + "/analyzedInstructions?apiKey=d36cb53813e341069b3c81d6d3b61c31");
-
-        //Storing Recipe information - RT
-        //recipe = await Http.GetFromJsonAsync<RecipeModel>(apiRecipeInstructionsLinkStart + this.id +
-        //     "/information?includeNutrition=false&metaInformation=true&apiKey=d36cb53813e341069b3c81d6d3b61c31");
-
-        //Correcting image link so it can be pulled from the correct database off API link - RT
-        //recipe.image = imageSourceRecipe + id.ToString() + "-" + "480x360." + recipe.imageType.ToString();
-
-        //Getting email of current User - RT
-        currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
-
-        //Getting Current user instance. This is where Guid is also gained - RT
-        currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
-
-        missingIngredients = await sessionStorage.GetItemAsync<string>("missingIngredientString");
-
-        stringCleaner(missingIngredients);
-
         recipeDetails = await Http.GetFromJsonAsync<RecipeDetails[]>(apiRecipeInformationBulkBaseUrl + id + apiKey);
+
+        //Need to be in a try/catch since this page can be loaded without the user loggin in - RT
+        try
+        {
+            //Getting email of current User - RT
+            currentUserEmail = await sessionStorage.GetItemAsync<string>("email");
+
+            //Getting Current user instance. This is where Guid is also gained - RT
+            currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
+
+            //Getting missing ingredients if user used the find recipe from fridge path - RT
+            missingIngredientsString = await sessionStorage.GetItemAsync<string>("missingIngredientString");
+            missingIngredientUnitsString = await sessionStorage.GetItemAsync<string>("missingIngredientUnitString");
+            missingIngredientAmountString = await sessionStorage.GetItemAsync<string>("missingIngredientAmountString");
+
+            stringCleaner(missingIngredientsString, missingIngredientList);
+            stringCleaner(missingIngredientUnitsString, missingIngredientUnit);
+            stringCleaner(missingIngredientAmountString, missingIngredientAmountList);
+
+        }
+        catch
+        {
+
+        }
+
         currentUrl = NavigationManager.Uri;
         fblink = "http://www.facebook.com/sharer.php?u=" + currentUrl;
         twlink = "https://twitter.com/share?url=" + currentUrl;
         rdlink = "http://reddit.com/submit?url=" + currentUrl;
     }
 
-
-    public void stringCleaner(string uncleanString)
+    //Removing and breaking up all the commas from the string of missing ingredients to add to the razor code - RT
+    public void stringCleaner(string uncleanString, List<string> stringList)
     {
         string totalWord = "";
         foreach (char c in uncleanString)
@@ -184,18 +215,33 @@ else
             }
             else
             {
-                missingIngredientList.Add(totalWord);
+                stringList.Add(totalWord);
                 totalWord = "";
             }
         }
     }
 
+    //Hiding popup box when okay is clicked -RT
+    private void click(object args)
+    {
+        DialogObj.Hide();
+    }
+
+    //Adding the missing ingredients to the db - RT
     public async Task addToShoppingListButton()
     {
-        foreach (var ing in missingIngredientList)
+        for (int i = 0; i < missingIngredientList.Count; i++)
         {
-            var response = await Http.PostAsJsonAsync("api/userShoppingListController", ing);
+            UserShoppingList newItem = new UserShoppingList();
+
+            newItem.IngredientName = missingIngredientList[i];
+            newItem.Quantity = double.Parse(missingIngredientAmountList[i]);
+            newItem.Unit = missingIngredientUnit[i];
+
+            var response = await Http.PostAsJsonAsync("api/userShoppingListController", newItem);
         }
+
+        await DialogObj.Show();
     }
 
 
@@ -227,3 +273,10 @@ else
         testButtons = "review button pressed";
     }
 }
+
+<!--Style for Popup button after adding to Shopping List - RT-->
+<style>
+    .e-setting-icon::before {
+        content: '\e679';
+    }
+</style>

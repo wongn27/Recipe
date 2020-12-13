@@ -10,8 +10,8 @@ using Recipe.Web.Data;
 namespace Recipe.Web.Data.Migrations
 {
     [DbContext(typeof(RecipeContext))]
-    [Migration("20201209232202_Create_Recipes_RatingsReviews_Table")]
-    partial class Create_Recipes_RatingsReviews_Table
+    [Migration("20201212021830_AlterUserShoppingList")]
+    partial class AlterUserShoppingList
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -131,8 +131,8 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Rating")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("RecipeId")
                         .HasColumnType("uniqueidentifier");
@@ -304,26 +304,21 @@ namespace Recipe.Web.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("IngredientName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
-
                     b.ToTable("Users_ShoppingList");
-                });
-
-            modelBuilder.Entity("Recipe.Web.Data.Models.UserShoppingList", b =>
-                {
-                    b.HasOne("Recipe.Web.Data.Models.Ingredient", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId");
-
-                    b.Navigation("Ingredient");
                 });
 #pragma warning restore 612, 618
         }

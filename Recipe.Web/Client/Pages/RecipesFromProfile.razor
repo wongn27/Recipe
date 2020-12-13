@@ -92,21 +92,29 @@ else
         int recipeId = recipe.id;
         string recipeName = recipe.title;
         string missingIngs = "";
+        string missingIngUnits = "";
+        string missingIngAmount = "";
         int ingredientCount = 0;
 
         //Saving missing ingredients to long string - RT
         foreach (var ings in recipe.missedIngredients)
         {
             missingIngs += (ings.name);
+            missingIngUnits += (ings.unit.ToString());
+            missingIngAmount += (ings.amount.ToString());
             ingredientCount++;
             if (ingredientCount != recipe.missedIngredientCount)
             {
                 missingIngs += ",";
+                missingIngUnits += ",";
+                missingIngAmount += ",";
             }
         }
 
         //Saving long string to sessionStorage and pulling on recipe page - RT
         await sessionStorage.SetItemAsync<string>("missingIngredientString", missingIngs);
+        await sessionStorage.SetItemAsync<string>("missingIngredientUnitString", missingIngUnits);
+        await sessionStorage.SetItemAsync<string>("missingIngredientAmountString", missingIngAmount);
         navigationManager.NavigateTo("/recipepage/" + recipeId.ToString() + "/" + recipeName);
 
     }

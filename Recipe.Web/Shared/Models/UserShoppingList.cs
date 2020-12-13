@@ -8,9 +8,9 @@ namespace Recipe.Web.Data.Models
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-
         public string IngredientName { get; set; }
-        public int Quantity { get; set; }
-        public Ingredient Ingredient { get; set; }
+        public double Quantity { get; set; }
+        public string Unit { get; set; }
+   
     }
 }
