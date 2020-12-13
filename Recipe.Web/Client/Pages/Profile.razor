@@ -124,6 +124,15 @@
     </Authorized>
 </AuthorizeView>
 
+@if(deleteSwitch == true)
+{
+   var result = DeleteItemsFromFridge();
+}
+else
+{
+
+}
+
 
 
 @code {
@@ -187,6 +196,8 @@
 
     //Object to get recipes that user uploaded
     UserRecipePost[] userRecipePosts { get; set; }
+
+    bool deleteSwitch = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -322,7 +333,8 @@
         StateHasChanged();
     }
 
-    List<UserFridgeIngredient> testList = new List<UserFridgeIngredient>();
+
+    List<UserFridgeIngredient> deleteList = new List<UserFridgeIngredient>();
 
     //Event handler before the item is deleted from the users fridge. This is where the item is removed from DB - RT
     public async Task BatchDeleteEvent(BeforeBatchDeleteArgs<UserFridgeIngredient> args)
@@ -334,28 +346,53 @@
         var selectedData = this.grid.GetSelectedRecords();
 
         //Waits for the 'selectedData' to be completed executing - RT
+        //(From what I understand "GetSelectedRecords" is a Task and for this code below to work, that 'Records' task must be
+        //Completed first. This is why we use OnCompleted)
         selectedData.GetAwaiter().OnCompleted(() =>
         {
-            //Getting data from selected rows and putting them in a new List to be deleted - RT
-            List<UserFridgeIngredient> deleteIngredientsList = selectedData.Result;
-            foreach (var i in deleteIngredientsList)
+
+            totalIngsSelected = 0;
+            //Getting data from selected rows and putting them in a new List - RT
+            List<UserFridgeIngredient> tempList = selectedData.Result;
+
+            //Probably don't need, will test later - RT
+            StateHasChanged();
+
+            //This is to clear the list before the ingredients are added. Failsafe just in case the user
+            //removes items - RT
+            IngredientsToSearchByList.Clear();
+
+            //Addind the SELECTED ingredients to the list that will be used to serach for Recipes - RT
+            foreach (var t in tempList)
             {
-                testList.Add(i);
+                totalIngsSelected++;
+                deleteList.Add(new UserFridgeIngredient
+                {
+                    Name = t.Name,
+                    Id = t.Id,
+                    Quantity = t.Quantity,
+                    Unit = t.Unit
+                });
             }
 
+            //Rerendering to show seleted ingredients each time
+            StateHasChanged();
         });
 
-        await Delete();
         StateHasChanged();
+        deleteSwitch = true;
     }
 
-    public async Task Delete()
+
+    //Deleting selected Items from User fridge - RT
+    public async Task DeleteItemsFromFridge()
     {
-        foreach (var i in testList)
+        foreach (var i in deleteList)
         {
-            var response = await client.DeleteAsync("api/userFridgeIng/" + i.Id.ToString());
+            var response = await client.DeleteAsync("api/userFridgeIng/" + i.Id);
+            var test = response.ReasonPhrase;
         }
-        testList.Clear();
+        deleteList.Clear();
 
     }
 
@@ -369,7 +406,7 @@
             int numberOfItems = selectedRecipeChoiceFullClicks.Count;
             //Going back to the twice since the clicks are stored as a pair - RT
             string lastRecipeClicked = selectedRecipeChoiceFullClicks[numberOfItems - 2].Item2;
- 
+
             navigationManager.NavigateTo("/recipefromprofile");
         }
         else

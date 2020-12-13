@@ -1,18 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Recipe.Web.Data;
 using Recipe.Web.Data.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Recipe.Web.Server.Controllers
 {
-    [ApiController]
     [Route("api/userShoppingListController")]
+    [ApiController]
     public class UserShoppingListController : ControllerBase
     {
-        private RecipeContext _context;
+        private readonly RecipeContext _context;
+
         public UserShoppingListController(RecipeContext context)
         {
             this._context = context;
@@ -57,7 +59,11 @@ namespace Recipe.Web.Server.Controllers
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var userIngredient = new UserShoppingList() { };
+            var userIngredient = _context.Users_ShoppingList.FirstOrDefault(s => s.Id.Equals(id));
+            if (userIngredient == null)
+            {
+                return BadRequest();
+            }
             _context.Remove(userIngredient);
             await _context.SaveChangesAsync();
             return NoContent();
