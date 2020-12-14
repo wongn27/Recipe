@@ -15,14 +15,14 @@ namespace Recipe.Web.Data.Utilities
         InstructionsById
     }
 
-    public class SpoonacularApiHelper
+    public class SpoonacularApiEndpointBuilder
     {
         // Key: Spoonacular Enum
         // Value: ApiEndpoint
         private Dictionary<SpoonacularApiEndpoint, ApiEndpoint> endpointsDictionary;
         private readonly SpoonacularApiEndpoint endpoint;
 
-        public SpoonacularApiHelper(SpoonacularApiEndpoint endpoint)
+        public SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint endpoint)
         {
             this.endpoint = endpoint;
             endpointsDictionary = new Dictionary<SpoonacularApiEndpoint, ApiEndpoint>();

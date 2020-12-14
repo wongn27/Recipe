@@ -28,16 +28,19 @@ namespace Recipe.Web.Server.Controllers
         }
 
         [HttpPost]
-        public void UserLogin(AuthenticateModel model)
+        public IActionResult UserLogin(AuthenticateModel model)
         {
             try
             {
-                loginService.Authenticate(model.Email, model.Password);
+                if (loginService.Authenticate(model.Email, model.Password))
+                    return Ok();
+                else
+                    return Forbid();
+                
             }
             catch (Exception e)
             {
-                // Send this error message to the user. 
-                // e.Message
+                return null;
             }
         }
     }
