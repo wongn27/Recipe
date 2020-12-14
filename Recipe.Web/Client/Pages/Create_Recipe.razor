@@ -35,7 +35,7 @@
     <br />
 
     <label>Ingredients</label>
-    <input type="text" @bind="i" />
+    <input type="text" @bind="inputIngredientsString" />
     <button type="button" @onclick="(() => addIngredient())">Add Ingredient</button>
     <p>
         @foreach (string x in ingredients)
@@ -46,7 +46,7 @@
 
     <label>Steps</label>
     <br />
-    <input type="text" @bind="s" />
+    <input type="text" @bind="inputStepString" />
     <button type="button" @onclick="(() => addStep())">Add Step</button>
     <p>
         @foreach (string x in steps)
@@ -92,8 +92,8 @@
     List<string> ingredients = new List<string>();
     private List<string> steps = new List<string>();
     private List<string> cuisines = new List<string>();
-    private string i = "";
-    private string s = "";
+    private string inputIngredientsString = "";
+    private string inputStepString = "";
     private string c = "";
     private string iList = "", sList = "", cList = "";
     private string currentUserEmail = "";
@@ -114,9 +114,12 @@
     //Add Ingredient to the recipe
     private void addIngredient()
     {
-        ingredients.Add(i);
-        iList = iList + i + ";";
+        if (string.IsNullOrEmpty(inputIngredientsString))
+            return;
+        ingredients.Add(inputIngredientsString);
+        iList = iList + inputIngredientsString + ";";
         recipe.Ingredients = iList;
+        inputIngredientsString = string.Empty;
     }
 
     //TBA: remove ingredients from the object- AL
@@ -134,9 +137,13 @@
     //Add a step to the recipe- AL
     private void addStep()
     {
-        steps.Add(s);
-        sList = sList + s + ";";
+        if (string.IsNullOrEmpty(inputStepString))
+            return;
+
+        steps.Add(inputStepString);
+        sList = sList + inputStepString + ";";
         recipe.Steps = sList;
+        inputStepString = string.Empty;
     }
 
     /*private void addCuisine()
