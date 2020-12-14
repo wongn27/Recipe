@@ -29,29 +29,26 @@ namespace Recipe.Web.Server.Controllers
             this.context = context;
             this.httpClient = httpClient;
         }
-        [HttpGet]
-        public async Task QuerySpoonacularRecipeApi(string searchString)
+
+        [HttpPost]
+        public async Task<IActionResult> SearchForRecipes(string apiRoute)
         {
-            var spoonacularRecipes = await GetApiResponseFromSpoonacular(searchString);
+            var spoonacularRecipes = await httpClient.GetFromJsonAsync<SpoonacularRecipe[]>(apiRoute);
             var mappingService = new RecipeMappingService();
-            IEnumerable<InTheFridgeRecipe> inTheFridgeRecipes = new List<InTheFridgeRecipe>();
+            var recipes = mappingService.MapTo(spoonacularRecipes);
 
-            foreach (var spoonRecipe in spoonacularRecipes)
-            {
-                var inTheFridgeRecipe = new InTheFridgeRecipe();
-                mappingService.MapSpoonacularRecipeToInTheFridgeRecipe(inTheFridgeRecipe, spoonRecipe);
-                if (!(inTheFridgeRecipe is null))
-                    continue;
+            if (!recipes.Any())
+                return null;
 
-                context.Recipes.Add(inTheFridgeRecipe);
-            }
-
+            context.Recipes.AddRange(recipes);
             context.SaveChanges();
+
+            return Ok();
         }
 
         private async Task<SpoonacularRecipe[]> GetApiResponseFromSpoonacular(string searchString)
         {
-            var helper = new SpoonacularApiHelper(SpoonacularApiEndpoint.ComplexSearch);
+            var helper = new SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint.ComplexSearch);
             helper.AddParameter("query", searchString);
             helper.AddParameter("number", 10);
             var spoonacularRecipes = await httpClient.GetFromJsonAsync<SpoonacularRecipe[]>(helper.BuildEndpoint());

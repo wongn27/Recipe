@@ -194,7 +194,7 @@ else
             return;
         }
 
-        var helper = new SpoonacularApiHelper(SpoonacularApiEndpoint.ComplexSearch);
+        var helper = new SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint.ComplexSearch);
         if (searchedItem != null)
         {
             helper.AddParameter<string>("query", searchedItem);
