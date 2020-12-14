@@ -13,11 +13,11 @@
     <Authorized>
         @if (FirstName == null)
         {
-
+            <p>Welcome, user.</p>
         }
         else
         {
-            <p>Welcome, @FirstName</p>
+            <p>Welcome, @(FirstName)! See your <a href="/profile">profile</a>. </p>
         }
 
     </Authorized>
