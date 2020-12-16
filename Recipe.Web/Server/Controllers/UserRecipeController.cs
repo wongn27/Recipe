@@ -36,5 +36,12 @@ namespace Recipe.Web.Server.Controllers
             var fridgeRecipe = await _context.Users_RecipePost.Where(a => a.UserId == id).ToListAsync();
             return Ok(fridgeRecipe);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var fridgeRecipe = await _context.Users_RecipePost.ToListAsync();
+            return Ok(fridgeRecipe);
+        }
     }
 }
