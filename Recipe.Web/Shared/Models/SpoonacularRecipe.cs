@@ -282,7 +282,7 @@ namespace Recipe.Web.Data.Models
         public double AverageRating { get; set; }
 
         [JsonPropertyName("ratingCount")]
-        public long RatingCount { get; set; }
+        public double RatingCount { get; set; }
 
         [JsonPropertyName("score")]
         public double Score { get; set; }

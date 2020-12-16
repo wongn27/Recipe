@@ -1,10 +1,10 @@
-@page "/recipepage/{id:int}/{title}"
+@page "/recipepage/{id:guid}/"
 @page "/recipepage"
+@using Recipe.Web.Data.Models
+@using Syncfusion.Blazor.Popups
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@using Recipe.Web.Data.Models
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@using Syncfusion.Blazor.Popups
 
 @if (recipeDetails == null)
 {
@@ -14,7 +14,6 @@
 else
 {
     <h3>@title</h3> <p>Date Added: TBD</p>
-
 
     <p>Cooking Time: @recipeDetails[0].readyInMinutes</p>
     <img src="@recipeDetails[0].image" />
