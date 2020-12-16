@@ -2,7 +2,7 @@
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Recipe.Web.Data.Utilities
-@using System.Text.Json
+@using System.Text.Json 
 @inject NavigationManager navigationManager
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -10,8 +10,8 @@
 
 
 <font size="8" face="arial" color="purple">
-    <i> <strong>In The Fridge</strong></i>
-</font>
+<i> <strong>In The Fridge</strong></i>
+            </font>
 
 
 <AuthorizeView>
@@ -27,15 +27,15 @@
 
     </Authorized>
     <NotAuthorized>
-        <p>Please <a href="/login">login</a> or <a href="/register">register</a> an account</p>
+        <p>Please <a href="/login">login</a> or register an account</p>
     </NotAuthorized>
 </AuthorizeView>
 
-@if (Recipes == null)
+@if (recipeTest == null)
 {
     <hr />
     <div class="input-group mb-3">
-        <input class="input-group-text text-info border-info" type="text" @bind="recipeSearchText" placeholder="Enter a recipe..." />
+        <input class="input-group-text text-info border-info" type="text" @bind="searchText" placeholder="Enter a recipe..." />
         <div class="input-group-prepend">
             <button title="Search for a recipe" class="btn btn-outline-info" style="margin-left:25px;" type="button" @onclick="Search">Search for Recipe</button>
         </div>
@@ -46,6 +46,27 @@
     </div>
     <br />
 
+
+    <!--Filters-->
+    <!-- These filters are not avaialble as parameters for the endpoint, but available only in the response. -->
+
+    <!--
+    <input title="Recipes built with sustainable ingredients?" type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable" @onchange="@SustainableCheckboxOnChange">
+    <label for="Sustainable"> Sustainable</label>
+    <br />
+
+    <input type="checkbox" id="Popular" name="Popular" value="Popular" @onchange="@PopularCheckboxOnChange">
+    <label for="Popular"> Popular</label>
+    <br />
+
+    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap" @onchange="@CheapCheckboxOnChange">
+    <label for="Cheap"> Cheap</label>
+    <br />
+
+    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy" @onchange="@HealthyCheckboxOnChange">
+    <label for="Healthy"> Healthy</label>
+    <br />
+    -->
     <br />
     <div>
         <!--Intolerences -->
@@ -73,36 +94,19 @@
 }
 else
 {
-    if (recipeSearchButtonPressed)
+    if (recipeSearchButtonPressed == true)
     {
         <div class="card-deck">
-            @foreach (var recipe in Recipes)
+            @foreach (var recipe in recipeTest.results)
             {
                 <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
                     <div class="card-header">
-                        <h3>@recipe.Name</h3>
+                        <h3>@recipe.title</h3>
                     </div>
-                    <img class="card-img-top" src="@recipe.PictureUrl" />
+                    <img class="card-img-top" src="@recipe.image" />
 
                     <div class="card-footer text-center">
-                        @(recipe.Description.Substring(0, 100))...
-
-                        @if (!recipe.IsCheap)
-                        {
-                            <span title="Expensive!" class="oi oi-dollar"></span>
-                        }
-                        @if (recipe.IsSustainable)
-                        {
-                            <span title="Sustainable!" class="oi oi-cart"></span>
-                        }
-                        @if (recipe.IsPopular)
-                        {
-                            <span title="Is popular!" class="oi oi-people"></span>
-                        }
-
-                    </div>
-                    <div class="card-footer text-center">
-                        <a href="/recipepage/@recipe.Id" class="btn btn-primary m-1">View Recipe</a>
+                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
                     </div>
                 </div>
             }
@@ -148,8 +152,8 @@ else
 @code {
     private int numberOfApiResults = 10;
     //Field entered in textbox - RT
-    public string recipeSearchText { get; set; }
-    public IEnumerable<InTheFridgeRecipe> Recipes { get; set; }
+    public string searchText { get; set; }
+    public IEnumerable<InTheFridgeRecipe> recipes;
     //Object that STORES the recipes from the search by user - RT
     RootobjectRecipe recipeTest;
     //Stores the random recipe - RT
@@ -177,10 +181,13 @@ else
     //Collection of user-created recipes that match the search by the user -RT
     List<UserRecipePost> matchingUserRecipeResults = new List<UserRecipePost>();
 
+
+
     protected override async Task OnInitializedAsync()
     {
         //Getting fun fact on the homepage -RT
-        funFact = await Http.GetFromJsonAsync<FunFact>("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+        funFact = await Http.GetFromJsonAsync<FunFact>
+            ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         //Getting current email of user logged in. This does the same as the code directly above.
         //Keeping both for testing purposes - RT
@@ -200,6 +207,7 @@ else
         catch
         {
         }
+
     }
 
     RecipeResults[] recipeResults;
@@ -211,17 +219,17 @@ else
     //Taking the string entered by the user and searching for recipes based on it -RT
     private async Task Search()
     {
-        if (string.IsNullOrEmpty(recipeSearchText))
+        if (string.IsNullOrEmpty(searchText))
         {
             await JS.InvokeAsync<object>("alert", "Search query is not valid. Please enter a search string.");
             return;
         }
 
-        if (recipeSearchText != null)
+        if (searchText != null)
         {
             var searchModel = new SpoonacularRecipeSearchModel()
             {
-                SearchString = recipeSearchText,
+                SearchString = searchText,
                 NumberOfResults = numberOfApiResults
             };
 
@@ -231,14 +239,15 @@ else
 
             var response = await Http.PostAsJsonAsync<SpoonacularRecipeSearchModel>("/recipe", searchModel);
 
-            Recipes = await response.Content.ReadFromJsonAsync<InTheFridgeRecipe[]>();
+            var json = await response.Content.ReadAsStringAsync();
+            recipes = JsonSerializer.Deserialize<InTheFridgeRecipe[]>(json);
             recipeSearchButtonPressed = true;
 
             //Getting all user created recipes - RT
-            //resultsFromUserRecipe = await Http.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController");
+            resultsFromUserRecipe = await Http.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController");
 
             //Running method to find matching recipes from user search - RT
-            //findMatchingRecipes();
+            findMatchingRecipes();
         }
     }
 
@@ -249,7 +258,7 @@ else
         {
             string dbUpperName = i.Name.ToUpper();
 
-            if (dbUpperName.Contains(recipeSearchText.ToUpper()))
+            if (dbUpperName.Contains(searchedItem.ToUpper()))
             {
                 matchingUserRecipeResults.Add(i);
 

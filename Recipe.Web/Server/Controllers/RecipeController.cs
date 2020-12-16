@@ -74,17 +74,7 @@ namespace Recipe.Web.Server.Controllers
                 endpointBuilder = new SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint.BulkRecipeByIds);
                 endpointBuilder.AddParameters("ids", ",", recipeIds);
                 var apiRouteRecipes = endpointBuilder.BuildEndpoint();
-                
-                var response = await httpClient.GetAsync(apiRouteRecipes);
-                var json = await response.Content.ReadAsStringAsync();
-                try
-                {
-                spoonRecipes = JsonSerializer.Deserialize<SpoonacularRecipe[]>(json);
-                }
-                catch (Exception e)
-                {
-
-                }
+                spoonRecipes = await httpClient.GetFromJsonAsync<SpoonacularRecipe[]>(apiRouteRecipes);
             }
 
             // Gather recipes stored in the recipes table that contains the search query in the name and description of the recipe.
@@ -102,7 +92,7 @@ namespace Recipe.Web.Server.Controllers
             {
                 var allRecipes = inTheFridgeRecipes.Concat(mappedRecipes).ToList();
                 var recipesToRender = allRecipes.DistinctBy(e => e.Name).DistinctBy(e => e.Description).ToList();
-                var distinctRecipes = allRecipes.ExceptBy(inTheFridgeRecipes, e => e.Description);
+                var distinctRecipes = allRecipes.ExceptBy(recipesToRender, e => e.Description).ToList();
 
                 if (distinctRecipes.Any())
                 {
