@@ -55,7 +55,8 @@ namespace Recipe.Web.Server.Services
             }
 
             inTheFridgeRecipe.Steps = string.Join(';', stepList);
-            inTheFridgeRecipe.Instructions = string.Join(';', stepList);
+            inTheFridgeRecipe.Instructions = spoon.Instructions;
+
             var steps = inTheFridgeRecipe.Steps.Split(';');
 
             // do the rest of the properties for InTheFridgeRecipe
