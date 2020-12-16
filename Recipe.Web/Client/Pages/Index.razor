@@ -2,6 +2,7 @@
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Recipe.Web.Data.Utilities
+@using System.Text.Json 
 @inject NavigationManager navigationManager
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -30,10 +31,10 @@
 {
     <hr />
     <div class="input-group mb-3">
+        <input class="input-group-text text-info border-info" type="text" @bind="searchText" placeholder="Enter a recipe..." />
         <div class="input-group-prepend">
-            <button title="Search for a recipe" class="btn btn-outline-info" type="button" @onclick="searchClick">Search for Recipe</button>
+            <button title="Search for a recipe" class="btn btn-outline-info" style="margin-left:25px;" type="button" @onclick="Search">Search for Recipe</button>
         </div>
-        <input class="input-group-text" type="text" @bind="searchedItem" placeholder="Enter a recipe..." />
     </div>
 
     <div>
@@ -129,9 +130,10 @@ else
 }
 
 @code {
-    private const int numberOfApiResults = 1;
+    private int numberOfApiResults = 1;
     //Field entered in textbox - RT
-    public string searchedItem { get; set; }
+    public string searchText { get; set; }
+    public IEnumerable<InTheFridgeRecipe> recipes;
     //Object that STORES the recipes from the search by user - RT
     RootobjectRecipe recipeTest;
     //Stores the random recipe - RT
@@ -186,38 +188,30 @@ else
     public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
 
     //Taking the string entered by the user and searching for recipes based on it -RT
-    private async Task searchClick()
+    private async Task Search()
     {
-        if (string.IsNullOrEmpty(searchedItem))
+        if (string.IsNullOrEmpty(searchText))
         {
             await JS.InvokeAsync<object>("alert", "Search query is not valid. Please enter a search string.");
             return;
         }
 
-        var helper = new SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint.ComplexSearch);
-        if (searchedItem != null)
+        if (searchText != null)
         {
-            helper.AddParameter<string>("query", searchedItem);
-            helper.AddParameter<int>("number", numberOfApiResults);
+            var searchModel = new SpoonacularRecipeSearchModel()
+            {
+                SearchString = searchText,
+                NumberOfResults = numberOfApiResults
+            };
 
-            var listOfIntolerances = new List<string>();
-            var listOfDiets = new List<string>();
+            searchModel.IsDairyFree = IsDairyFree;
+            searchModel.IsGlutenFree = IsGlutenFree;
+            searchModel.IsVegetarian = IsVegetarian;
 
-            if (IsDairyFree)
-                listOfIntolerances.Add("Dairy");
+            var response = await Http.PostAsJsonAsync<SpoonacularRecipeSearchModel>("/recipe", searchModel);
 
-            if (IsGlutenFree)
-                listOfIntolerances.Add("Gluten");
-
-            if (IsVegetarian)
-                listOfIntolerances.Add("Vegetarian");
-
-            if (listOfIntolerances.Any())
-                helper.AddParameters("intolerances", ",", listOfIntolerances.ToArray());
-
-            var requestUrl = helper.BuildEndpoint();
-
-            recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>(requestUrl);
+            var json = await response.Content.ReadAsStringAsync();
+            recipes = JsonSerializer.Deserialize<InTheFridgeRecipe[]>(json);
             recipeSearchButtonPressed = true;
         }
     }
