@@ -189,7 +189,7 @@ namespace Recipe.Web.Data.Models
     public class ExtendedIngredient
     {
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonPropertyName("aisle")]
         public string Aisle { get; set; }
