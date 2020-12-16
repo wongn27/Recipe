@@ -85,7 +85,7 @@ namespace Recipe.Web.Data.Models
             public string unit { get; set; }
             public string[] meta { get; set; }
             public string[] metaInformation { get; set; }
-            public Measures measures { get; set; }
+            public Measures2 measures { get; set; }
         }
 
         public class Measures2

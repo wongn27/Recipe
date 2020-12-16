@@ -7,7 +7,11 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IJSRuntime JS
 
-<h1>In The Fridge</h1>
+
+<font size="8" face="arial" color="purple">
+<i> <strong>In The Fridge</strong></i>
+            </font>
+
 
 <AuthorizeView>
     <Authorized>
@@ -22,7 +26,7 @@
 
     </Authorized>
     <NotAuthorized>
-        <p>Please <a href="/login">login</a> or register an account!</p>
+        <p>Please <a href="/login">login</a> or register an account</p>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -39,7 +43,6 @@
     <div>
         <button title="Find a random recipe" class="btn btn-outline-warning" type="button" @onclick="randomRecipeButton">Find Random Recipe</button>
     </div>
-
     <br />
 
 
@@ -117,20 +120,37 @@ else
                     <img class="card-img-top" src="@recipe.image" />
 
                     <div class="card-footer text-center">
-                        <a href="#" class="btn btn-primary m-1">Quick Description</a>
                         <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
-
-
-
-                        <!-- @if (displaySummarizationButtonPressed == true) -->
-                        <!--//  { -->
-                        <!--       <p> @summarizeRecipe.summary.ToString()</p> -->
-                        <!--//   }-->
-
                     </div>
                 </div>
             }
         </div>
+    }
+
+    if (foundTrigger == true)
+    {
+        @if (matchingUserRecipeResults.Count > 0)
+        {
+            <font size="5" face="arial" color="purple">
+                <i> <strong>User Created Recipes: </strong></i>
+
+            </font>
+            <div class="card-deck">
+                @foreach (var recipe in matchingUserRecipeResults)
+                {
+                    <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+                        <div class="card-header">
+                            <h3>@recipe.Name</h3>
+                        </div>
+                        <img class="card-img-top" src="/android-chrome-512x512.png" width="300" height="300" />
+
+                        <div class="card-footer text-center">
+                            <a href="/recipepage" class="btn btn-primary m-1">View Recipe</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     }
 }
 @if (funFact == null)
@@ -167,6 +187,15 @@ else
     public string currentUserEmail { get; set; }
     public string FirstName { get; set; }
 
+    //Collection of user recipes gained after user searches - RT
+    UserRecipePost[] resultsFromUserRecipe { get; set; }
+    bool foundTrigger = false;
+
+    //Collection of user-created recipes that match the search by the user -RT
+    List<UserRecipePost> matchingUserRecipeResults = new List<UserRecipePost>();
+
+
+
     protected override async Task OnInitializedAsync()
     {
         //Getting fun fact on the homepage -RT
@@ -197,7 +226,7 @@ else
     RecipeResults[] recipeResults;
     public string apiRecipeComplexSearchBaseUrl = "https://api.spoonacular.com/recipes/complexSearch";
     public string apiAddRecipeInfoParam = "?addRecipeInformation=true";
-    public string returnSingleResult = "&number=1";
+    public string returnSingleResult = "&number=20";
     public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
 
     //public bool isSelected = true;
@@ -299,7 +328,30 @@ else
 
             recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>(requestUrl);
             recipeSearchButtonPressed = true;
+
+            //Getting all user created recipes - RT
+            resultsFromUserRecipe = await Http.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController");
+
+            //Running method to find matching recipes from user search - RT
+            findMatchingRecipes();
         }
+    }
+
+    //Searching DB for recipes matching user search - RT
+    public void findMatchingRecipes()
+    {
+        foreach (var i in resultsFromUserRecipe)
+        {
+            string dbUpperName = i.Name.ToUpper();
+
+            if (dbUpperName.Contains(searchedItem.ToUpper()))
+            {
+                matchingUserRecipeResults.Add(i);
+
+            }
+        }
+        foundTrigger = true;
+
     }
 
     private bool IsPopular { get; set; } = false;
@@ -363,4 +415,3 @@ else
 
     }
 }
-

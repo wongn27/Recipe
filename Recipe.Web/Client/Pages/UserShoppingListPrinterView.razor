@@ -1,0 +1,79 @@
+﻿@page "/userShoppingListView"
+@using Recipe.Web.Data.Models
+@inject HttpClient client
+@inject IJSRuntime js
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager navigationManager
+@inject IJSRuntime IJS
+@layout BlankLayout
+
+
+
+@if (userShoppingListIngredientList != null)
+{
+<body onload="Window.print()">
+    <font size="8" face="arial" color="purple">
+        <i> <strong>In The Fridge Shopping List</strong></i>
+    </font>
+
+    @for (int i = 0; i < userShoppingListIngredientList.Count; i++)
+    {
+        <ul>
+            <li><span style="color: #c67eff;"><strong><em>@userShoppingListIngredientList[i] @userShoppingListAmountList[i] @userShoppingListUnitList[i]</em></strong></span></li>
+
+        </ul>
+    }
+</body>
+ }
+
+    @code {
+
+        string userShoppingListNameString { get; set; }
+        string userShoppingListUnitString { get; set; }
+        string userShoppingListAmountString { get; set; }
+
+        List<string> userShoppingListIngredientList = new List<string>();
+        List<string> userShoppingListUnitList = new List<string>();
+        List<string> userShoppingListAmountList = new List<string>();
+
+        bool printTrigger = false;
+
+protected override async Task OnInitializedAsync()
+    {
+
+        base.OnInitialized();
+
+        userShoppingListNameString = await sessionStorage.GetItemAsync<string>("userShoppingListItem");
+        userShoppingListAmountString = await sessionStorage.GetItemAsync<string>("userShoppingListAmount");
+        userShoppingListUnitString = await sessionStorage.GetItemAsync<string>("userShoppingListUnit");
+
+
+        // Cleaning strings to put each item into a list - RT
+        stringCleaner(userShoppingListNameString, userShoppingListIngredientList);
+        stringCleaner(userShoppingListAmountString, userShoppingListAmountList);
+        stringCleaner(userShoppingListUnitString, userShoppingListUnitList);
+    }
+
+    //Removing and breaking up all the commas from the string of user shopping list ingredients - RT
+    public void stringCleaner(string uncleanString, List<string> stringList)
+    {
+
+        string totalWord = "";
+
+        foreach (char c in uncleanString)
+        {
+            if (c != ',')
+            {
+                totalWord += c.ToString();
+            }
+            else
+            {
+                stringList.Add(totalWord);
+                totalWord = "";
+            }
+        }
+
+        stringList.Add(totalWord);
+    }
+
+    }
