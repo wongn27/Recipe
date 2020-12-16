@@ -34,8 +34,8 @@ namespace Recipe.Web.Data.Utilities
             endpointsDictionary.Add(SpoonacularApiEndpoint.ComplexSearch, new ApiEndpoint("https://api.spoonacular.com/recipes/complexSearch?"));
             endpointsDictionary.Add(SpoonacularApiEndpoint.FindByIngredients, new ApiEndpoint("https://api.spoonacular.com/recipes/findByIngredients?"));
             endpointsDictionary.Add(SpoonacularApiEndpoint.FindByNutrients, new ApiEndpoint("https://api.spoonacular.com/recipes/findByNutrients?"));
-            endpointsDictionary.Add(SpoonacularApiEndpoint.RecipeById, new ApiEndpoint("https://api.spoonacular.com/recipes/{id}/information"));
-            endpointsDictionary.Add(SpoonacularApiEndpoint.BulkRecipeByIds, new ApiEndpoint("https://api.spoonacular.com/recipes/informationBulk?ids=715538,716429"));
+            endpointsDictionary.Add(SpoonacularApiEndpoint.RecipeById, new ApiEndpoint("https://api.spoonacular.com/recipes/{id}/information?"));
+            endpointsDictionary.Add(SpoonacularApiEndpoint.BulkRecipeByIds, new ApiEndpoint("https://api.spoonacular.com/recipes/informationBulk?"));
             endpointsDictionary.Add(SpoonacularApiEndpoint.InstructionsById, new ApiEndpoint("https://api.spoonacular.com/recipes/{id}/analyzedInstructions?"));
         }
 
@@ -73,6 +73,19 @@ namespace Recipe.Web.Data.Utilities
         /// <param name="parameterDelimiter">The delmiter</param>
         /// <param name="values">A string sequence of values.</param>
         public void AddParameters(string parameterName, string parameterDelimiter, params string[] values)
+        {
+            var parameters = string.Join(parameterDelimiter, values);
+            AddParameter(parameterName, parameters);
+        }
+
+
+        /// <summary>
+        /// Adds a delimited multi-variable parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter for the endpoint.</param>
+        /// <param name="parameterDelimiter">The delmiter</param>
+        /// <param name="values">A string sequence of values.</param>
+        public void AddParameters<T>(string parameterName, string parameterDelimiter, params T[] values)
         {
             var parameters = string.Join(parameterDelimiter, values);
             AddParameter(parameterName, parameters);
