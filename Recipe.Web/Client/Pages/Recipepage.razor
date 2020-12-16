@@ -20,18 +20,36 @@ else
     <img src="@recipeDetails[0].image" />
 
     <!-- Only showing the missing ingredients if user is logged in and they used items from their fridge -RT-->
-    if (missingIngredientList.Count > 0)
+    if (missingIngrdientListSwitch == true)
     {
         <p><strong><em><span style="color: #ff0000;">Missing Ingredients</span></em></strong></p>
 
-        
+
         @for (int i = 0; i < missingIngredientList.Count; i++)
         {
             <ul>
-                <li><span style="color: #ff0000;"><strong><em>@missingIngredientList[i]: @missingIngredientAmountList[i] @missingIngredientUnit[i]</em></strong></span></li>
+                <li><span style="color: #ff0000;"><strong><em>@missingIngredientList[i]  : @missingIngredientAmountList[i] @missingIngredientUnit[i]</em></strong></span></li>
             </ul>
         }
         <button type="button" class="btn btn-success" @onclick="addToShoppingListButton"><i class="oi oi-cart"></i>Add Missing to Shopping List</button>
+
+        <p><strong><em><span style="color: #13bb1a;">Used Ingredients</span></em></strong></p>
+        @for (int i = 0; i < usedIngredientsFromUserFridgeList.Count; i++)
+        {
+            <ul>
+                <li><span style="color: #13bb1a;"><strong><em>@usedIngredientsFromUserFridgeList[i]  : @usedIngredientsAmountFromUserFridgeList[i] @usedIngredientsUnitFromUserFridgeList[i]</em></strong></span></li>
+            </ul>
+        }
+        //Popup window after removing items from fridge - RT
+        <SfDialog Content="@ContentIngsRemoved" Header="@HeaderIngsRemoved" Width="350px" Height="250px" Visible="false" @ref="DialObjRemoved">
+            <DialogPositionData X="300" Y="200"></DialogPositionData>
+            <DialogButtons>
+                <DialogButton OnClick="@clickIngsRemoved">
+                    <DialogButtonModel Content="OK" IsPrimary="true"></DialogButtonModel>
+                </DialogButton>
+            </DialogButtons>
+        </SfDialog>
+
 
         //Popup window after adding items to Shopping List - RT
         <SfDialog Content="@Content" Header="@Header" Width="350px" Height="250px" Visible="false" @ref="DialogObj">
@@ -45,9 +63,9 @@ else
     }
     else
     {
-        
+
     }
-    <br/>
+    <br />
     <br />
     <p>@((MarkupString)recipeDetails[0].summary)</p>
 
@@ -68,7 +86,6 @@ else
     }
 
     <body>
-
 
         <!--Picture and Description section (default picture and description) -AL-->
         @*<img src="@recipe.image" /> <p></p>*@
@@ -97,16 +114,18 @@ else
 
     </body>
     <br />
+    <button type="button" class="btn btn-success" @onclick="markedAsCooked"><i class="oi-bookmark"></i>Marked as Cooked</button>
+    <br />
     <div text-align:center>
-        <h6>Reviews</h6>
-        <p>@id</p>
+        <!--<h6>Reviews</h6>
+        <p>@id</p>-->
         @*@foreach (var item in recipe.missedIngredients)
             {
                 <p>item.name</p>
             }*@
         @*<p>@recipe.missedIngredientCount</p>*@
-<textarea></textarea> <br />
-        <button @onclick="reviewClick">Post Review</button>
+@*<textarea></textarea> <br />
+        <button @onclick="reviewClick">Post Review</button>*@
         <br /> <br />
         <input type="button" value="Print/Save Recipe" onClick="window.print()">
     </div>
@@ -141,15 +160,24 @@ else
     //Instance of RecipeModel to store recipe info (Not cooking instructions). See "RecipeModel.cs" for variables - RT
     RecipeModel recipe;// = new RecipeModel();
 
-    //String to get missing Ingredients form RecipesFromProfile page
+    //String to get missing AND used Ingredients form RecipesFromProfile page
     string missingIngredientsString { get; set; }
     string missingIngredientUnitsString { get; set; }
     string missingIngredientAmountString { get; set; }
+    string usedIngredientsForRecipeFromUserFridge { get; set; }
+    string usedIngredientsAmountFromUserFridge { get; set; }
+    string usedIngredientsUnitFromUserFridge { get; set; }
 
     //List used to populate the razor and add to db context - RT
     List<string> missingIngredientList = new List<string>();
     List<string> missingIngredientUnit = new List<string>();
     List<string> missingIngredientAmountList = new List<string>();
+    List<string> usedIngredientsFromUserFridgeList = new List<string>();
+    List<string> usedIngredientsUnitFromUserFridgeList = new List<string>();
+    List<string> usedIngredientsAmountFromUserFridgeList = new List<string>();
+
+    //Switch to run html after all missing ingredients are populated - RT
+    public bool missingIngrdientListSwitch = false;
 
     //Current Users email - RT
     public string currentUserEmail { get; set; }
@@ -161,6 +189,9 @@ else
     SfDialog DialogObj;
     public string Content = "Items Added To Shopping List";
     public string Header = "Shopping List";
+    SfDialog DialObjRemoved;
+    public string ContentIngsRemoved = "";
+    public string HeaderIngsRemoved = "Ingredients Removed From Fridge";
 
     RecipeDetails[] recipeDetails;
     public string apiRecipeInformationBulkBaseUrl = "https://api.spoonacular.com/recipes/informationBulk?ids=";
@@ -182,14 +213,22 @@ else
             //Getting Current user instance. This is where Guid is also gained - RT
             currentUser = await Http.GetFromJsonAsync<User>("api/userController/" + currentUserEmail.ToString());
 
-            //Getting missing ingredients if user used the find recipe from fridge path - RT
+            //Getting missing and used ingredients if user used the find recipe from fridge path - RT
             missingIngredientsString = await sessionStorage.GetItemAsync<string>("missingIngredientString");
             missingIngredientUnitsString = await sessionStorage.GetItemAsync<string>("missingIngredientUnitString");
             missingIngredientAmountString = await sessionStorage.GetItemAsync<string>("missingIngredientAmountString");
+            usedIngredientsForRecipeFromUserFridge = await sessionStorage.GetItemAsync<string>("usedIngredients");
+            usedIngredientsUnitFromUserFridge = await sessionStorage.GetItemAsync<string>("usedIngredientUnitString");
+            usedIngredientsAmountFromUserFridge = await sessionStorage.GetItemAsync<string>("usedIngredientAmountString");
 
+
+            //Cleaning strings to put each item into a list - RT
             stringCleaner(missingIngredientsString, missingIngredientList);
             stringCleaner(missingIngredientUnitsString, missingIngredientUnit);
             stringCleaner(missingIngredientAmountString, missingIngredientAmountList);
+            stringCleaner(usedIngredientsForRecipeFromUserFridge, usedIngredientsFromUserFridgeList);
+            stringCleaner(usedIngredientsUnitFromUserFridge, usedIngredientsUnitFromUserFridgeList);
+            stringCleaner(usedIngredientsAmountFromUserFridge, usedIngredientsAmountFromUserFridgeList);
 
         }
         catch
@@ -206,12 +245,14 @@ else
     //Removing and breaking up all the commas from the string of missing ingredients to add to the razor code - RT
     public void stringCleaner(string uncleanString, List<string> stringList)
     {
+
         string totalWord = "";
+
         foreach (char c in uncleanString)
         {
             if (c != ',')
             {
-                totalWord += c;
+                totalWord += c.ToString();
             }
             else
             {
@@ -219,12 +260,22 @@ else
                 totalWord = "";
             }
         }
+
+        stringList.Add(totalWord);
+
+        missingIngrdientListSwitch = true;
     }
+
 
     //Hiding popup box when okay is clicked -RT
     private void click(object args)
     {
         DialogObj.Hide();
+    }
+
+    private void clickIngsRemoved(object args)
+    {
+        DialObjRemoved.Hide();
     }
 
     //Adding the missing ingredients to the db - RT
@@ -237,6 +288,7 @@ else
             newItem.IngredientName = missingIngredientList[i];
             newItem.Quantity = double.Parse(missingIngredientAmountList[i]);
             newItem.Unit = missingIngredientUnit[i];
+            newItem.UserId = this.currentUser.Id;
 
             var response = await Http.PostAsJsonAsync("api/userShoppingListController", newItem);
         }
@@ -244,8 +296,38 @@ else
         await DialogObj.Show();
     }
 
+    //This will take the ingredients that are being cooked with and remove them from the users fridge -RT
+    //If the user has more in their fridge then is needed, it is subtracted and not fulled removed -RT
+    public async Task markedAsCooked()
+    {
+        UserFridgeIngredient[] currentUserFridge = await Http.GetFromJsonAsync<UserFridgeIngredient[]>("api/userFridgeIng/" + currentUser.Id);
 
+        foreach (var itemInFridge in currentUserFridge)
+        {
+            for (int i = 0; i < usedIngredientsFromUserFridgeList.Count; i++)
+            {
+                if (usedIngredientsFromUserFridgeList[i].Contains(itemInFridge.Name))
+                {
+                    if (itemInFridge.Quantity > double.Parse(usedIngredientsAmountFromUserFridgeList[i]))
+                    {
+                        itemInFridge.Quantity = (itemInFridge.Quantity - double.Parse(usedIngredientsAmountFromUserFridgeList[i]));
+                        var number = itemInFridge.Quantity;
+                        var test = number;
+                        await Http.PutAsJsonAsync("api/userFridgeIng/", itemInFridge);
 
+                        ContentIngsRemoved += itemInFridge.Name + " x " + usedIngredientsAmountFromUserFridgeList[i].ToString() + "\n";
+                    }
+                    else
+                    {
+                        ContentIngsRemoved += itemInFridge.Name + " all removed" + "\n" ;
+                        await Http.DeleteAsync("api/userFridgeIng/" + itemInFridge.Id);
+                    }
+                }
+            }
+        }
+        //Showing dialogBox After removing ingredients from users fridge - RT
+        await DialObjRemoved.Show();
+    }
 
     private string testButtons;
 

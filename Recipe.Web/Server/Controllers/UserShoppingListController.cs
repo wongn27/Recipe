@@ -20,12 +20,12 @@ namespace Recipe.Web.Server.Controllers
             this._context = context;
         }
 
-        //GET - Get all the Shopping List ingredients stored in the context - RT
+        //GET - Get all the shopping list elements stored in the context - RT
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var shoppingList = await _context.Users_ShoppingList.ToListAsync();
-            return Ok(shoppingList);
+            var shoppingIngredients = await _context.Users_ShoppingList.ToListAsync();
+            return Ok(shoppingIngredients);
         }
 
 

@@ -51,7 +51,7 @@ else
     //Starting URL for the Recipe Search - RT
     string apiRecipeSearchStart = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
     //Number of recipes returned
-    string numOfRecipesSearchedFor = "&number=5";
+    string numOfRecipesSearchedFor = "&number=20";
     //The starting URL for the images - RT
     string imageSourceRecipe = "https://spoonacular.com/recipeImages/";
 
@@ -111,10 +111,33 @@ else
             }
         }
 
+        string usedIngredients = "";
+        string usedIngUnits = "";
+        string usedIngAmount = "";
+        ingredientCount = 0;
+
+        foreach(var ings in recipe.usedIngredients)
+        {
+            usedIngredients += (ings.name);
+            usedIngUnits += (ings.unit.ToString());
+            usedIngAmount += (ings.amount.ToString());
+            ingredientCount++;
+
+            if (ingredientCount != recipe.usedIngredientCount)
+            {
+                usedIngredients += ",";
+                usedIngUnits += ",";
+                usedIngAmount += ",";
+            }
+        }
+
         //Saving long string to sessionStorage and pulling on recipe page - RT
         await sessionStorage.SetItemAsync<string>("missingIngredientString", missingIngs);
         await sessionStorage.SetItemAsync<string>("missingIngredientUnitString", missingIngUnits);
         await sessionStorage.SetItemAsync<string>("missingIngredientAmountString", missingIngAmount);
+        await sessionStorage.SetItemAsync<string>("usedIngredients", usedIngredients);
+        await sessionStorage.SetItemAsync<string>("usedIngredientUnitString", usedIngUnits);
+        await sessionStorage.SetItemAsync<string>("usedIngredientAmountString", usedIngAmount);
         navigationManager.NavigateTo("/recipepage/" + recipeId.ToString() + "/" + recipeName);
 
     }

@@ -10,7 +10,7 @@ namespace Recipe.Web.Data.Models
         public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public int? Quantity { get; set; }
+        public double? Quantity { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public Guid UserId { get; set; }
         public string Unit { get; set; }        
