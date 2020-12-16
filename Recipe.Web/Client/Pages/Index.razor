@@ -131,7 +131,7 @@ else
                         <img class="card-img-top" src="/android-chrome-512x512.png" width="300" height="300" />
 
                         <div class="card-footer text-center">
-                            <button type="button" @onclick="@(() => selectedUserRecipe(recipe.Id))" class="btn btn-primary m-1">View Recipe</button>
+                            <a href="/recipepage" class="btn btn-primary m-1">View Recipe</a>
                         </div>
                     </div>
                 }
@@ -327,17 +327,5 @@ else
         string recipeTitle = randomRecipe.recipes[0].title;
         navigationManager.NavigateTo("/recipepage/" + recipeID.ToString() + "/" + recipeTitle);
 
-    }
-
-    Guid userRecipeId { get; set; }
-
-    private async Task selectedUserRecipe(Guid id)
-    {
-        userRecipeId = id;
-
-
-        await sessionStorage.SetItemAsync<Guid>("createdUserRecipeID", userRecipeId);
-
-        navigationManager.NavigateTo("/userRecipe");
     }
 }

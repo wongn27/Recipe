@@ -114,10 +114,7 @@ else
 
     </body>
     <br />
-    if (currentUser != null)
-    {
     <button type="button" class="btn btn-success" @onclick="markedAsCooked"><i class="oi-bookmark"></i>Marked as Cooked</button>
-    }
     <br />
     <div text-align:center>
         <!--<h6>Reviews</h6>
@@ -304,38 +301,32 @@ else
     public async Task markedAsCooked()
     {
         UserFridgeIngredient[] currentUserFridge = await Http.GetFromJsonAsync<UserFridgeIngredient[]>("api/userFridgeIng/" + currentUser.Id);
-        try
-        {
-            foreach (var itemInFridge in currentUserFridge)
-            {
-                for (int i = 0; i < usedIngredientsFromUserFridgeList.Count; i++)
-                {
-                    if (usedIngredientsFromUserFridgeList[i].Contains(itemInFridge.Name))
-                    {
-                        if (itemInFridge.Quantity > double.Parse(usedIngredientsAmountFromUserFridgeList[i]))
-                        {
-                            itemInFridge.Quantity = (itemInFridge.Quantity - double.Parse(usedIngredientsAmountFromUserFridgeList[i]));
-                            var number = itemInFridge.Quantity;
-                            var test = number;
-                            await Http.PutAsJsonAsync("api/userFridgeIng/", itemInFridge);
 
-                            ContentIngsRemoved += itemInFridge.Name + " x " + usedIngredientsAmountFromUserFridgeList[i].ToString() + "\n";
-                        }
-                        else
-                        {
-                            ContentIngsRemoved += itemInFridge.Name + " all removed" + "\n";
-                            await Http.DeleteAsync("api/userFridgeIng/" + itemInFridge.Id);
-                        }
+        foreach (var itemInFridge in currentUserFridge)
+        {
+            for (int i = 0; i < usedIngredientsFromUserFridgeList.Count; i++)
+            {
+                if (usedIngredientsFromUserFridgeList[i].Contains(itemInFridge.Name))
+                {
+                    if (itemInFridge.Quantity > double.Parse(usedIngredientsAmountFromUserFridgeList[i]))
+                    {
+                        itemInFridge.Quantity = (itemInFridge.Quantity - double.Parse(usedIngredientsAmountFromUserFridgeList[i]));
+                        var number = itemInFridge.Quantity;
+                        var test = number;
+                        await Http.PutAsJsonAsync("api/userFridgeIng/", itemInFridge);
+
+                        ContentIngsRemoved += itemInFridge.Name + " x " + usedIngredientsAmountFromUserFridgeList[i].ToString() + "\n";
+                    }
+                    else
+                    {
+                        ContentIngsRemoved += itemInFridge.Name + " all removed" + "\n" ;
+                        await Http.DeleteAsync("api/userFridgeIng/" + itemInFridge.Id);
                     }
                 }
             }
-            //Showing dialogBox After removing ingredients from users fridge - RT
-            await DialObjRemoved.Show();
         }
-        catch
-        {
-
-        }
+        //Showing dialogBox After removing ingredients from users fridge - RT
+        await DialObjRemoved.Show();
     }
 
     private string testButtons;
