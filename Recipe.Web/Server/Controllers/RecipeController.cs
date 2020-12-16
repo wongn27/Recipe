@@ -74,16 +74,16 @@ namespace Recipe.Web.Server.Controllers
                 endpointBuilder = new SpoonacularApiEndpointBuilder(SpoonacularApiEndpoint.BulkRecipeByIds);
                 endpointBuilder.AddParameters("ids", ",", recipeIds);
                 var apiRouteRecipes = endpointBuilder.BuildEndpoint();
-
+                
                 var response = await httpClient.GetAsync(apiRouteRecipes);
                 var json = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    spoonRecipes = JsonSerializer.Deserialize<SpoonacularRecipe[]>(json);
+                spoonRecipes = JsonSerializer.Deserialize<SpoonacularRecipe[]>(json);
                 }
                 catch (Exception e)
                 {
-                    return BadRequest(e);
+
                 }
             }
 
@@ -95,16 +95,7 @@ namespace Recipe.Web.Server.Controllers
 
             // Map spoonacular recipes to InTheFridgeRecipes.
             var mappingService = new RecipeMappingService();
-            List<InTheFridgeRecipe> mappedRecipes = null;
-
-            if (spoonRecipes is null)
-            {
-                mappedRecipes = new List<InTheFridgeRecipe>();
-            }
-            else
-            {
-                mappedRecipes = mappingService.MapTo(spoonRecipes).ToList();
-            }
+            var mappedRecipes = mappingService.MapTo(spoonRecipes).ToList();
 
             // If there are any recipes in the database, lets remove some from api results so we dont display the same recipe twice.
             if (inTheFridgeRecipes.Any() || mappedRecipes.Any())
