@@ -181,19 +181,19 @@ else
 
 @code {
 
-    //Used to store when the user clicks the NestedList. This stores the strings
-    //i.e - first string seleced is the created Recipe (Ex: Chicken soup) and after,
-    //"View Recipe". If the newest item added is "View Recipe," a method in triggered
-    //to pull the recipe before the "View Recipe" item - RT
-    //Using a Tuple so the clicks are stored in pairs. - RT
-    List<Tuple<string, string>> seletedNestedList = new List<Tuple<string, string>>();
+        //Used to store when the user clicks the NestedList. This stores the strings
+        //i.e - first string seleced is the created Recipe (Ex: Chicken soup) and after,
+        //"View Recipe". If the newest item added is "View Recipe," a method in triggered
+        //to pull the recipe before the "View Recipe" item - RT
+        //Using a Tuple so the clicks are stored in pairs. - RT
+        List<Tuple<string, string>> seletedNestedList = new List<Tuple<string, string>>();
 
-    //Works with the selectedRecipe list. This list is not
-    //cleared after each click. The "selectedRecipe" is.
-    //See "ViewRecipeNestedListClick" for more details - RT
-    List<Tuple<string, string>> selectedRecipeChoiceFullClicks = new List<Tuple<string, string>>();
+        //Works with the selectedRecipe list. This list is not
+        //cleared after each click. The "selectedRecipe" is.
+        //See "ViewRecipeNestedListClick" for more details - RT
+        List<Tuple<string, string>> selectedRecipeChoiceFullClicks = new List<Tuple<string, string>>();
 
-    List<string> guidListRecipeChiceFromPost = new List<string>();
+        List<string> guidListRecipeChiceFromPost = new List<string>();
 
     //This class is needed to bind to the list data of the Created recipes - RT
     class UserRecipePostDataModel
@@ -291,19 +291,28 @@ else
 
         userShoppingListDataGridList = userShoppingList.ToList();
 
-
-        //Gets UserRecipePosts if there are any and stores them in an object - RT
-        userRecipePosts = await client.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController/" + currentUser.Id);
-
-        //Used to fill the NestedListView of user created Recipes - RT
-        foreach (var post in userRecipePosts)
+        try
         {
-            userRecipePostDataModel.Add(new UserRecipePostDataModel
+
+            //Gets UserRecipePosts if there are any and stores them in an object - RT
+            userRecipePosts = await client.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController/" + currentUser.Id);
+
+
+
+            //Used to fill the NestedListView of user created Recipes - RT
+            foreach (var post in userRecipePosts)
             {
-                Id = post.Id.ToString(),
-                name = post.Name,
-                Child = new List<UserRecipePostDataModel>() { new UserRecipePostDataModel { Id = post.Id.ToString(), name = "View Recipe" } }
-            });
+                userRecipePostDataModel.Add(new UserRecipePostDataModel
+                {
+                    Id = post.Id.ToString(),
+                    name = post.Name,
+                    Child = new List<UserRecipePostDataModel>() { new UserRecipePostDataModel { Id = post.Id.ToString(), name = "View Recipe" } }
+                });
+            }
+        }
+        catch
+        {
+
         }
     }
 

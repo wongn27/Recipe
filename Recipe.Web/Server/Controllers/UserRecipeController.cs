@@ -38,12 +38,12 @@ namespace Recipe.Web.Server.Controllers
         }
 
         //GET - Get all UserRecipePosts stored in the context based on user Guid - RT
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetRecipe(Guid id)
-        {
-            var fridgeRecipe = await _context.Users_RecipePost.FirstOrDefaultAsync(a => a.Id == id);
-            return Ok(fridgeRecipe);
-        }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetRecipe(Guid id)
+        //{
+        //    var fridgeRecipe = await _context.Users_RecipePost.FirstOrDefaultAsync(a => a.Id == id);
+        //    return Ok(fridgeRecipe);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> Get()
