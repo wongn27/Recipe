@@ -2,6 +2,7 @@
 @using Recipe.Web.Data.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Recipe.Web.Data.Utilities
+@using System.Text.Json
 @inject NavigationManager navigationManager
 @inject HttpClient Http
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
@@ -9,35 +10,35 @@
 
 
 <font size="8" face="arial" color="purple">
-<i> <strong>In The Fridge</strong></i>
-            </font>
+    <i> <strong>In The Fridge</strong></i>
+</font>
 
 
 <AuthorizeView>
     <Authorized>
         @if (FirstName == null)
         {
-
+            <p>Welcome, user.</p>
         }
         else
         {
-            <p>Welcome, @FirstName</p>
+            <p>Welcome, @(FirstName)! See your <a href="/profile">profile</a>. </p>
         }
 
     </Authorized>
     <NotAuthorized>
-        <p>Please <a href="/login">login</a> or register an account</p>
+        <p>Please <a href="/login">login</a> or <a href="/register">register</a> an account</p>
     </NotAuthorized>
 </AuthorizeView>
 
-@if (recipeTest == null)
+@if (Recipes == null)
 {
     <hr />
     <div class="input-group mb-3">
+        <input class="input-group-text text-info border-info" type="text" @bind="recipeSearchText" placeholder="Enter a recipe..." />
         <div class="input-group-prepend">
-            <button title="Search for a recipe" class="btn btn-outline-info" type="button" @onclick="searchClick">Search for Recipe</button>
+            <button title="Search for a recipe" class="btn btn-outline-info" style="margin-left:25px;" type="button" @onclick="Search">Search for Recipe</button>
         </div>
-        <input class="input-group-text" type="text" @bind="searchedItem" placeholder="Enter a recipe..." />
     </div>
 
     <div>
@@ -45,32 +46,11 @@
     </div>
     <br />
 
-
-    <!--Filters-->
-    <!-- These filters are not avaialble as parameters for the endpoint, but available only in the response. -->
-
-    <!--
-    <input title="Recipes built with sustainable ingredients?" type="checkbox" id="Sustainable" name="Sustainable" value="Sustainable" @onchange="@SustainableCheckboxOnChange">
-    <label for="Sustainable"> Sustainable</label>
-    <br />
-
-    <input type="checkbox" id="Popular" name="Popular" value="Popular" @onchange="@PopularCheckboxOnChange">
-    <label for="Popular"> Popular</label>
-    <br />
-
-    <input type="checkbox" id="Cheap" name="Cheap" value="Cheap" @onchange="@CheapCheckboxOnChange">
-    <label for="Cheap"> Cheap</label>
-    <br />
-
-    <input type="checkbox" id="Healthy" name="Healthy" value="Healthy" @onchange="@HealthyCheckboxOnChange">
-    <label for="Healthy"> Healthy</label>
-    <br />
-    -->
     <br />
     <div>
         <!--Intolerences -->
         <label class="col-form-label-lg text-success">
-            Intolerences
+            Filters
         </label>
 
         <br />
@@ -90,37 +70,39 @@
     </div>
     <br />
 
-    // @if (isSelected)
-    //{
-    @*<input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="LoadVeganRecipes" bind="@isSelected" checked @onclick="LoadVeganRecipes"/>
-        <label for="Vegan"> Vegan</label>*@
-    //}
-    @*else
-        {
-            <input type="checkbox" id="Vegan" name="Vegan" value="Vegan" @onchange="@(async (e) => await ToggleSelectedAsync(false))" />
-            <label for="Vegan"> Vegan</label>
-        }*@
-    <br />
-    <input type="checkbox" class="form-check-input" @onchange="CheckChanged" />
-    <label for="Test"> Test</label>
-    <p>@checkChanged</p>
-
 }
 else
 {
-    if (recipeSearchButtonPressed == true)
+    if (recipeSearchButtonPressed)
     {
         <div class="card-deck">
-            @foreach (var recipe in recipeTest.results)
+            @foreach (var recipe in Recipes)
             {
                 <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
                     <div class="card-header">
-                        <h3>@recipe.title</h3>
+                        <h3>@recipe.Name</h3>
                     </div>
-                    <img class="card-img-top" src="@recipe.image" />
+                    <img class="card-img-top" src="@recipe.PictureUrl" />
 
                     <div class="card-footer text-center">
-                        <a href="/recipepage/@recipe.id/@recipe.title" class="btn btn-primary m-1">View Recipe</a>
+                        @(recipe.Description.Substring(0, 100))...
+
+                        @if (!recipe.IsCheap)
+                        {
+                            <span title="Expensive!" class="oi oi-dollar"></span>
+                        }
+                        @if (recipe.IsSustainable)
+                        {
+                            <span title="Sustainable!" class="oi oi-cart"></span>
+                        }
+                        @if (recipe.IsPopular)
+                        {
+                            <span title="Is popular!" class="oi oi-people"></span>
+                        }
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="/recipepage/@recipe.Id" class="btn btn-primary m-1">View Recipe</a>
                     </div>
                 </div>
             }
@@ -145,7 +127,7 @@ else
                         <img class="card-img-top" src="/android-chrome-512x512.png" width="300" height="300" />
 
                         <div class="card-footer text-center">
-                            <button type="button" @onclick="@(() => selectedUserRecipe(recipe.Id))" class="btn btn-primary m-1">View Recipe</button>
+                            <a href="/recipepage" class="btn btn-primary m-1">View Recipe</a>
                         </div>
                     </div>
                 }
@@ -164,9 +146,11 @@ else
 }
 
 @code {
+
     private const int numberOfApiResults = 20;
     //Field entered in textbox - RT
-    public string searchedItem { get; set; }
+    public string recipeSearchText { get; set; }
+    public IEnumerable<InTheFridgeRecipe> Recipes { get; set; }
     //Object that STORES the recipes from the search by user - RT
     RootobjectRecipe recipeTest;
     //Stores the random recipe - RT
@@ -194,13 +178,10 @@ else
     //Collection of user-created recipes that match the search by the user -RT
     List<UserRecipePost> matchingUserRecipeResults = new List<UserRecipePost>();
 
-
-
     protected override async Task OnInitializedAsync()
     {
         //Getting fun fact on the homepage -RT
-        funFact = await Http.GetFromJsonAsync<FunFact>
-            ("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
+        funFact = await Http.GetFromJsonAsync<FunFact>("https://api.spoonacular.com/food/trivia/random?apiKey=d36cb53813e341069b3c81d6d3b61c31");
 
         //Getting current email of user logged in. This does the same as the code directly above.
         //Keeping both for testing purposes - RT
@@ -220,7 +201,6 @@ else
         catch
         {
         }
-
     }
 
     RecipeResults[] recipeResults;
@@ -229,111 +209,37 @@ else
     public string returnSingleResult = "&number=20";
     public string apiKey = "&apiKey=d36cb53813e341069b3c81d6d3b61c31";
 
-    //public bool isSelected = true;
-
-    private string checkChanged = "I am not checked";
-    [Parameter]
-    public bool isChecked { get; set; } = true;
-
-    private void CheckChanged()
-    //private List<RecipeResults> CheckChanged()
-    {
-        //List<RecipeResults> veganRecipes = new List<RecipeResults>();
-
-        if (!isChecked)
-        {
-            checkChanged = "Unchecked now!!";
-            isChecked = !isChecked;
-        }
-        else
-        {
-            checkChanged = "You have checked me now!!";
-            isChecked = !isChecked;
-
-            //veganRecipes = recipeResults.Where(x => x.vegan == true).ToList();
-
-        }
-
-        //return veganRecipes;
-    }
-
-
-    //protected override async Task OnInitializedAsync()
-    //  {
-    //      recipeResults = await Http.GetFromJsonAsync<RecipeResults[]>(apiRecipeComplexSearchBaseUrl + apiAddRecipeInfoParam + returnSingleResult + apiKey);
-    //  }
-
-    //private List<RecipeResults> LoadVeganRecipes(ChangeEventArgs e)
-    ////protected List<RecipeResults> LoadVeganRecipes()
-    //{
-    //    //if (isSelected)
-    //    //{
-    //    //var veganRecipes = recipeResults.Where<RecipeResults>(Func<RecipeResults, bool> )
-    //    //IEnumerable<RecipeResults> veganRecipes = from recipe in recipeResults
-    //    //                                          where recipe.vegan is true
-    //    //                                          select recipe;
-
-    //    List<RecipeResults> veganRecipes = recipeResults.Where(x => x.vegan).ToList();
-    //    return veganRecipes;
-    //    //}
-    //}
-
-
-    //List<Guid> list = new List<Guid>();
-    //User[] user { get; set; }
-
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    user = await Http.GetFromJsonAsync<User[]>("api/ingredientController");
-
-    //    var numbers2 = from u in ingredients
-    //                   where u.Name == "Taco"
-    //                   select u.Id;
-
-    //    list = numbers2.ToList();
-
-    //}
-
     //Taking the string entered by the user and searching for recipes based on it -RT
-    private async Task searchClick()
+    private async Task Search()
     {
-        if (string.IsNullOrEmpty(searchedItem))
+        if (string.IsNullOrEmpty(recipeSearchText))
         {
             await JS.InvokeAsync<object>("alert", "Search query is not valid. Please enter a search string.");
             return;
         }
 
-        var helper = new SpoonacularApiHelper(SpoonacularApiEndpoint.ComplexSearch);
-        if (searchedItem != null)
+        if (recipeSearchText != null)
         {
-            helper.AddParameter<string>("query", searchedItem);
-            helper.AddParameter<int>("number", numberOfApiResults);
+            var searchModel = new SpoonacularRecipeSearchModel()
+            {
+                SearchString = recipeSearchText,
+                NumberOfResults = numberOfApiResults
+            };
 
-            var listOfIntolerances = new List<string>();
-            var listOfDiets = new List<string>();
+            searchModel.IsDairyFree = IsDairyFree;
+            searchModel.IsGlutenFree = IsGlutenFree;
+            searchModel.IsVegetarian = IsVegetarian;
 
-            if (IsDairyFree)
-                listOfIntolerances.Add("Dairy");
+            var response = await Http.PostAsJsonAsync<SpoonacularRecipeSearchModel>("/recipe", searchModel);
 
-            if (IsGlutenFree)
-                listOfIntolerances.Add("Gluten");
-
-            if (IsVegetarian)
-                listOfIntolerances.Add("Vegetarian");
-
-            if (listOfIntolerances.Any())
-                helper.AddParameters("intolerances", ",", listOfIntolerances.ToArray());
-
-            var requestUrl = helper.BuildEndpoint();
-
-            recipeTest = await Http.GetFromJsonAsync<RootobjectRecipe>(requestUrl);
+            Recipes = await response.Content.ReadFromJsonAsync<InTheFridgeRecipe[]>();
             recipeSearchButtonPressed = true;
 
             //Getting all user created recipes - RT
-            resultsFromUserRecipe = await Http.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController");
+            //resultsFromUserRecipe = await Http.GetFromJsonAsync<UserRecipePost[]>("api/userRecipeController");
 
             //Running method to find matching recipes from user search - RT
-            findMatchingRecipes();
+            //findMatchingRecipes();
         }
     }
 
@@ -344,7 +250,7 @@ else
         {
             string dbUpperName = i.Name.ToUpper();
 
-            if (dbUpperName.Contains(searchedItem.ToUpper()))
+            if (dbUpperName.Contains(recipeSearchText.ToUpper()))
             {
                 matchingUserRecipeResults.Add(i);
 
@@ -413,17 +319,5 @@ else
         string recipeTitle = randomRecipe.recipes[0].title;
         navigationManager.NavigateTo("/recipepage/" + recipeID.ToString() + "/" + recipeTitle);
 
-    }
-
-    Guid userRecipeId { get; set; }
-
-    private async Task selectedUserRecipe(Guid id)
-    {
-        userRecipeId = id;
-
-
-        await sessionStorage.SetItemAsync<Guid>("createdUserRecipeID", userRecipeId);
-
-        navigationManager.NavigateTo("/userRecipe");
     }
 }

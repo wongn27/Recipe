@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Recipe.Web.Data.Models
 {
-    public class Temperatures
+    public class SpoonacularRecipeComplexSearchResponse
     {
         [JsonPropertyName("results")]
         public Result[] Results { get; set; }

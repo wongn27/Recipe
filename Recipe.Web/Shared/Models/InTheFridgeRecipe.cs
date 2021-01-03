@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Recipe.Web.Data.Enums;
 
 namespace Recipe.Web.Data.Models
 {
-    public class InTheFridgeRecipe
+    public class InTheFridgeRecipe : IEqualityComparer<InTheFridgeRecipe>
     {
         public Guid Id { get; set; }
         public DateTime DateAdded { get; set; }
@@ -32,5 +33,15 @@ namespace Recipe.Web.Data.Models
         public bool IsHealthy { get; set; }
         public bool IsSustainable { get; set; }
 
+        public bool Equals(InTheFridgeRecipe x, InTheFridgeRecipe y)
+        {
+            return x.Name.Equals(y.Name, StringComparison.OrdinalIgnoreCase) &&
+                   x.Description.Equals(y.Description, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public int GetHashCode(InTheFridgeRecipe obj)
+        {
+            return obj.Name.GetHashCode() ^ obj.Description.GetHashCode();
+        }
     }
 }
